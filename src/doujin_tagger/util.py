@@ -39,9 +39,9 @@ def dl_cover(url):
         "Host": "img.dlsite.jp",
     }
     retry = 3
+    url = "https:" + url
     while retry > 0:
         try:
-            url = "https:" + url
             res = requests.get(url, timeout=10, headers=headers)
             res.raise_for_status()
             break

@@ -68,7 +68,6 @@ docs/_build
 .mypy_cache/
 
 doujin
-*.bat
 docs
 *.spec
 desktop.ini

@@ -86,6 +86,7 @@ def test_mp3_save(mp3):
     # 检查save()有没有漏掉info中必须保存到文件的字段
     assert len(temp) == 2
 
+
 def test_mp3_set_image(mp3, cover):
     mp3.set_image(cover)
     mp3.save()
@@ -103,12 +104,13 @@ def test_mp4_save(mp4):
     mp4.save()
     a = MP4File(MP4_PATH)
     temp = info.copy()
-    
+
     for k, v in a.audio.items():
-        print(k,v)
+        print(k, v)
         if k in TRANSLATE:
             if k.startswith('----'):
-                assert list(each.decode() for each in v) == temp.pop(TRANSLATE[k])
+                assert list(each.decode()
+                            for each in v) == temp.pop(TRANSLATE[k])
             else:
                 assert v == temp.pop(TRANSLATE[k])
         else:

@@ -7,6 +7,7 @@ from doujin_tagger.spider import spider_dlsite
 
 DIR = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(DIR, 'data')
+INFO = {"rjcode": "RJ0"}
 
 params = [
     ("RJ249851.html", {
@@ -33,7 +34,7 @@ params = [
 class TestDlsite:
     @pytest.mark.online
     def test_dlsite_404_online(self, caplog):
-        spider_dlsite('RJ0')
+        spider_dlsite(INFO)
         # set `log_level = INFO` in pytest.ini
         res = [record for record in caplog.records]
         assert len(res) == 1
@@ -44,7 +45,7 @@ class TestDlsite:
         resp = requests.Response()
         resp.status_code = 404
         mock_req.return_value = resp
-        spider_dlsite('RJ0')
+        spider_dlsite(INFO)
         res = [record for record in caplog.records]
         assert len(res) == 1
         assert 'NotFound' in res[0].message
@@ -52,7 +53,7 @@ class TestDlsite:
     @patch('requests.get')
     def test_dlsite_timeout(self, mock_req, caplog):
         mock_req.side_effect = requests.Timeout('mock timeout')
-        spider_dlsite(' RJ0')
+        spider_dlsite(INFO)
         res = [record for record in caplog.records]
         assert len(res) == 4
         assert 'Maxtries' in res.pop().message
@@ -69,5 +70,7 @@ class TestDlsite:
         resp.text = content
         mock_req.return_value = resp
         mock_req.text = 'haha'
-        info = spider_dlsite('RJ0')
+        info = {'rjcode': name[:name.index('.')]}
+        info = spider_dlsite(info)
+        info.pop('rjcode')
         assert info == expected

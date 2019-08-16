@@ -86,7 +86,7 @@ class DictMixin(MutableMapping):
 
 class AudioFile(DictMixin):
     _registry = {}
-    exclude = ("filename", "rjcode", "image_url", "cover")
+    exclude = ("filename", "image_url", "cover")
     @classmethod
     def __init_subclass__(cls, ext=None, **kwargs):
         super().__init_subclass__(**kwargs)

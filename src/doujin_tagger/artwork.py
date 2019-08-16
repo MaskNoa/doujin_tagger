@@ -45,7 +45,6 @@ class ArtWork:
     fields = {"album", "tags"}
 
     def __init__(self, rjcode, work_path, dest):
-        self.rjcode = rjcode
         self.work_path = Path(work_path)
         self.dest = Path(dest)
         self.logger = MyLogger(logger, {"ref": self})
@@ -53,7 +52,7 @@ class ArtWork:
         self.has_unsupport_fmt = False
         self._update_audios()
         # <doujin> tag is always set to "1" to distinguish with normal music
-        self.info = {"doujin": "1"}
+        self.info = {"doujin": "1", "rjcode": rjcode}
 
     def _update_audios(self):
         for root, _, files in os.walk(self.work_path):
@@ -101,7 +100,7 @@ class ArtWork:
         langs = ["JP", "CN"]
         for k, func in self.spiders.items():
             self.logger.info(f"scraping [{k}] [{langs[lang]}]")
-            self.info = func(self.rjcode, self.info, lang)
+            self.info = func(self.info, lang)
         for each in self.audios:
             each.feed(self.info)
         if cover:

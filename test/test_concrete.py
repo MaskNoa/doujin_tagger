@@ -19,8 +19,10 @@ info = {
     'album': ['Rain'], 'artist': ['miku', 'reimu'],
     'maker': ['ShangHai Alice'], 'nsfw': ['PG'],
     'tags': ['Jpop', 'Rock'],
+    'rjcode': ['rj23232'],
     'image_url': ['E:/test/xxx.mp3'],
     'not exclude': ['woops'],
+    'doujin': ['1'],
 }
 
 IDS = ID3File.IDS
@@ -72,14 +74,17 @@ def test_mp3_save(mp3):
     mp3.feed(info)
     mp3.save()
     a = MP3File(MP3_PATH)
+    temp = info.copy()
+    # 检查save()是否保存到文件
     for k, v in a.audio.tags.items():
         if k in IDS:
-            assert v.text == info[IDS[k]]
+            assert v.text == temp.pop(IDS[k])
         elif k[5:] in TXXX_MAP:
-            assert v.text == info[TXXX_MAP[k[5:]]]
+            assert v.text == temp.pop(TXXX_MAP[k[5:]])
         else:
-            assert 0  # extra fields found
-
+            assert 0
+    # 检查save()有没有漏掉info中必须保存到文件的字段
+    assert len(temp) == 2
 
 def test_mp3_set_image(mp3, cover):
     mp3.set_image(cover)
@@ -97,14 +102,18 @@ def test_mp4_save(mp4):
     mp4.feed(info)
     mp4.save()
     a = MP4File(MP4_PATH)
+    temp = info.copy()
+    
     for k, v in a.audio.items():
+        print(k,v)
         if k in TRANSLATE:
             if k.startswith('----'):
-                assert list(each.decode() for each in v) == info[TRANSLATE[k]]
+                assert list(each.decode() for each in v) == temp.pop(TRANSLATE[k])
             else:
-                assert v == info[TRANSLATE[k]]
+                assert v == temp.pop(TRANSLATE[k])
         else:
             assert 0
+    assert len(temp) == 2
 
 
 def test_mp4_set_image(mp4, cover):

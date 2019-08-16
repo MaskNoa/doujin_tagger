@@ -45,6 +45,7 @@ class ArtWork:
     fields = {"album", "tags"}
 
     def __init__(self, rjcode, work_path, dest):
+        self.rjcode = rjcode
         self.work_path = Path(work_path)
         self.dest = Path(dest)
         self.logger = MyLogger(logger, {"ref": self})

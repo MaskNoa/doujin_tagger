@@ -49,7 +49,7 @@ class DictMixin(MutableMapping):
 
     def tolist(self, key):
         """return value in list"""
-        val = self.get(key)
+        val = self._data.get(key)
         return val.strip().split("\n") if val else []
 
     def add(self, key, value):

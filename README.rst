@@ -58,6 +58,13 @@ Attention
 * **not support WAV** for now.
 * Saving cover CAN be very slow if the file is very large. Use ``--nocov`` to disable.
 
+ChangeLog
+==========
+v0.2.0 (2019-8-30)
+-------------------
+* [feat] add rjcode tags
+* [feat] add series tags
+* [fix] url concat in dlsite spider 
 
 .. |travis| image:: https://travis-ci.org/maybeRainH/doujin_tagger.svg?branch=master
     :target: https://travis-ci.org/maybeRainH/doujin_tagger   

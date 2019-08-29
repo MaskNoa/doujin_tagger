@@ -10,7 +10,7 @@ def long_description():
 
 setup(
     name="doujin_tagger",
-    version="0.1.0",
+    version="0.2.0",
     author="maybeRainH",
     author_email="gooloo911110@gmail.com",
     package_dir={"": "src"},

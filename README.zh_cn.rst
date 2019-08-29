@@ -56,6 +56,14 @@ doujin_tagger 是一个同人音声音频的批量标签处理程序.
 * **暂时不支持WAV文件**
 * 保存封面 **可能** 很慢如果文件很大,使用 ``--nocov`` 来禁用保存封面的功能
 
+更新日志
+=========
+v0.2.0 (2019-8-30)
+-------------------
+* [feat] 新增 ``rjcode`` 的tag
+* [feat] 新增 ``series`` 的tag
+* [fix] dlsite爬虫中的请求地址的拼接错误 
+
 
 .. |travis| image:: https://travis-ci.org/maybeRainH/doujin_tagger.svg?branch=master
     :target: https://travis-ci.org/maybeRainH/doujin_tagger

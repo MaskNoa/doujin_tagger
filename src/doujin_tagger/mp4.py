@@ -13,7 +13,8 @@ class MP4File(AudioFile, ext=["mp4", "m4a", "m4v", "3gp", "3g2", "3gp2"]):
         "----:com.apple.iTunes:DOUJIN": "doujin",
         "----:com.apple.iTunes:MAKER": "maker",
         "----:com.apple.iTunes:NSFW": "nsfw",
-        "----:com.apple.iTunes:RJCODE": "rjcode", }
+        "----:com.apple.iTunes:RJCODE": "rjcode",
+        "----:com.apple.iTunes:SERIES": "series"}
     rtranslate = {v: k for k, v in translate.items()}
 
     def __init__(self, filename):

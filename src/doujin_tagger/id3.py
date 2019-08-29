@@ -21,6 +21,7 @@ class ID3File(AudioFile, ext=None):
         "NSFW": "nsfw",
         "TAGS": "tags",
         "RJCODE": "rjcode",
+        "SERIES": "series"
     }
 
     SDI = {v: k for k, v in IDS.items()}

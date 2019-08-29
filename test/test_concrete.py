@@ -23,6 +23,7 @@ info = {
     'image_url': ['E:/test/xxx.mp3'],
     'not exclude': ['woops'],
     'doujin': ['1'],
+    'series': ['S'],
 }
 
 IDS = ID3File.IDS
@@ -139,6 +140,7 @@ def test_xiph_save(flac):
     assert 'filename' in a
     assert 'filename' not in a.audio.tags
     assert 'not exclude' in a.audio.tags
+    assert 'series' in a.audio.tags
     temp = info.copy()
     temp.pop('image_url')
     assert temp == d

@@ -11,6 +11,7 @@ JP_TRANSDICT = {
     "声優": "artist",
     "年齢指定": "nsfw",
     "ジャンル": "tags",
+    "シリーズ名": "series",
 }
 
 # [TODO] Dlsite now support Chinese.
@@ -19,6 +20,7 @@ CN_TRANSDICT = {
     "声优": "artist",
     "年龄指定": "nsfw",
     "分类": "tags",
+    "系列名": "series",
 }
 TRANSDICTS = [JP_TRANSDICT, CN_TRANSDICT]
 LANG = ["ja;q=1", "zh-CN,zh;q=1"]

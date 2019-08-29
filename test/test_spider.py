@@ -10,24 +10,26 @@ DATA = os.path.join(DIR, 'data')
 INFO = {"rjcode": "RJ0"}
 
 params = [
-    ("RJ249851.html", {
-        "artist": ["陽向葵ゅか", "篠守ゆきこ"],
-        "album":["【バイノーラル】先輩とお姉さまにメスイキ調教されるあなた【百合 TS催眠】"],
+    ("RJ234446.html", {
+        "artist": ["琴香", "箱河ノア", "藤堂れんげ"],
+        "album":["【大人向け耳かき】道草屋 はこべら5 時計修理のはこべらさん。他【汗の匂い】"],
         "nsfw":["18禁"],
-        "date":["2019-04"],
-        "maker":["ユビノタクト"],
-        "image_url":["//img.dlsite.jp/modpub/images2/work/doujin/RJ250000/RJ249851_img_main.jpg"],  # noqa
-        "tags":["バイノーラル/ダミヘ", "催眠音声", "女体化", "性転換(TS)", "百合", "レズ/女同士"],
+        "date":["2018-09"],
+        "maker":["桃色CODE"],
+        "image_url":["//img.dlsite.jp/modpub/images2/work/doujin/RJ235000/RJ234446_img_main.jpg"],  # noqa
+        "tags":["ローション", "耳かき", "耳舐め"],
+        "series":["【耳かき】道草屋【安眠】"],
     }),
-    # no artist
+    # no artist, no series
     ("RJ202459.html", {
         'album': ['オナ指示、オナサポボイス10本セット(CV 如月なずな様10)'],
         'nsfw':["18禁"],
         'date':["2017-06"],
         'maker':['アイボイス'],
         'image_url':['//img.dlsite.jp/modpub/images2/work/doujin/RJ203000/RJ202459_img_main.jpg'],  # noqa
-        'tags':['淫語', 'オナニー', '言葉責め', '逆レイプ', '童貞', '包茎']
-    })
+        'tags':['淫語', 'オナニー', '言葉責め', '逆レイプ', '童貞', '包茎'],
+        'series': ['如月なずなさん作品'],
+    }),
 ]
 
 

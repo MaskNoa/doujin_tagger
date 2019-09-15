@@ -1,7 +1,7 @@
 doujin_tagger
 =============
 
-|travis|
+|travis|  |support|
 
 `中文说明 <README.zh_cn.rst>`__
 
@@ -68,3 +68,4 @@ v0.2.0 (2019-8-30)
 
 .. |travis| image:: https://travis-ci.org/maybeRainH/doujin_tagger.svg?branch=master
     :target: https://travis-ci.org/maybeRainH/doujin_tagger   
+.. |support| image:: https://img.shields.io/badge/support-mp3%7Cm4a%7Cxiph(ogg%2Cflac...)-orange

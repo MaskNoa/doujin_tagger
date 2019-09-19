@@ -19,7 +19,7 @@ fileformatter = logging.Formatter(
 filelog.setFormatter(fileformatter)
 ch = logging.StreamHandler()
 chformatter = logging.Formatter(
-    "%(name)-8s %(funcName)-16s| %(levelname)-8s | %(message)s")
+    "%(funcName)-16s| %(levelname)-8s | %(message)s")
 ch.setFormatter(chformatter)
 ch.setLevel(logging.INFO)
 logger.addHandler(ch)

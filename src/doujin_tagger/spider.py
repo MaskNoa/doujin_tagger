@@ -48,7 +48,7 @@ def spider_dlsite(info, lang=0):
             maxtries -= 1
             continue
         except requests.ConnectionError as e:
-            logger.error(repr(e) + f"<{rjcode}> RETRING [maxtries]")
+            logger.error(repr(e) + f"<{rjcode}> RETRING [{maxtries}]")
             maxtries -= 1
             continue
     else:

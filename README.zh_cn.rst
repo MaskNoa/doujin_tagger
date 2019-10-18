@@ -22,22 +22,11 @@ doujin_tagger 是一个同人音声音频的批量标签处理程序.
 --cov, -c             保存封面(默认)
 --nocov, -q           不保存封面
 --debug               单线程测试用
---show                显示保存在本地文件里的 ``orig`` 和 ``dest`` 配置
 --lang LANG, -l LANG  0: 日语标签(默认), 1: 中文标签
 
-第一次使用::
+使用::
 
-    doutag -o <文件夹> -d <文件夹> -q
-    
-再成功处理了一次以后,就可以省略 ``orig`` and ``dest``::
-
-    doutag -q
-
-``orig`` and ``dest`` 选项的设置会被保存在本地配置文件中.
-
-为了覆盖本地文件配置,你必须同时再次提供 ``orig`` and ``dest`` 的配置选项.
-
-现在,dlsite有中文翻译了,特别是标签,所以使用``--lang=1``来下载中文标签
+    doutag -o <文件夹> -d <文件夹> -q --lang=1
 
 如何工作
 =============
@@ -54,7 +43,7 @@ doujin_tagger 是一个同人音声音频的批量标签处理程序.
 * ``orig`` 和 ``dest`` **必须** 处于同一分区
 * ``orig`` 和 ``dest`` **不能** 一个是另一个的子文件夹甚至同一文件夹
 * **暂时不支持WAV文件**
-* 保存封面 **可能** 很慢如果文件很大,使用 ``--nocov`` 来禁用保存封面的功能
+* 保存封面 **可能** 很慢如果文件很大,使用 ``--nocov(-q)`` 来禁用保存封面的功能
 
 更新日志
 =========
@@ -63,7 +52,6 @@ v0.2.0 (2019-8-30)
 * [feat] 新增 ``rjcode`` 的tag
 * [feat] 新增 ``series`` 的tag
 * [fix] dlsite爬虫中的请求地址的拼接错误 
-
 
 .. |travis| image:: https://travis-ci.org/maybeRainH/doujin_tagger.svg?branch=master
     :target: https://travis-ci.org/maybeRainH/doujin_tagger

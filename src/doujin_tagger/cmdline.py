@@ -1,8 +1,11 @@
 import sys
+import logging
+from os import path
 from argparse import ArgumentParser
 
 from doujin_tagger import __author__, __version__
 
+logger = logging.getLogger(__name__)
 
 def banner():
     print('''
@@ -30,9 +33,28 @@ def cmd_parser():
                         dest="cover", help="do not save cover")
     parser.add_argument("--debug", action="store_true", dest="debug",
                         default=False, help="run in single thread for debug")
-    parser.add_argument("--show", action="store_true", dest="show",
-                        default=False, help="show orig & dest in config file")
     parser.add_argument("--lang", "-l", type=int, dest="lang", action="store",
                         default=0, help="0 for Japanese(default), 1 for Chinese")
+    parser.add_argument("--proxy", type=str, dest="proxy", action="store",
+                        help="proxy, the same as 'requests' module")                   
+                        
     options = parser.parse_args(sys.argv[1:])
+    if not (options.orig and options.dest):
+        logger.error("必须提供orig和dest参数")
+        exit(1)
+    if not path.exists(options.orig) or not path.exists(options.dest):
+        logger.error("orig或者dest文件夹不存在")
+        exit(1)
+    # for file rename, we must have both on the same mount point.
+    # XXX not tested on *nix if two on different mount point
+    if path.splitdrive(options.orig)[0] != path.splitdrive(options.dest)[0]:
+        logger.error("orig和dest文件夹不在一个分区")
+        exit(1)
+    logger.debug(f"options is {options}")
     return options
+
+
+
+
+
+

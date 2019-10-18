@@ -24,7 +24,7 @@ setup(
     long_description=long_description(),
     long_description_content_type="text/x-rst",
     license="MIT",
-    url="https://github.com/caiheyao/doujin_tagger",
+    url="https://github.com/maybeRainH/doujin_tagger",
     classifiers=[
         "Programming Language :: Python :: 3.7",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",

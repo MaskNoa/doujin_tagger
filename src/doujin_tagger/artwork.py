@@ -94,14 +94,15 @@ class ArtWork:
         """make sure rjcode and album are present to complete rename process"""
         return not (self.fields - self.info.keys())
 
-    def fetch_and_feed(self, cover=True, lang=0):
+    def fetch_and_feed(self, proxy, cover=True, lang=0):
         """give info fetched by spiders to each `AudioFile`"""
 
         # info's value must be a list
         langs = ["JP", "CN"]
+        
         for k, func in self.spiders.items():
             self.logger.info(f"scraping [{k}] [{langs[lang]}]")
-            self.info = func(self.info, lang)
+            self.info = func(self.info, proxy, lang)
         for each in self.audios:
             each.feed(self.info)
         if cover:

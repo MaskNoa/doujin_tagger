@@ -26,7 +26,7 @@ TRANSDICTS = [JP_TRANSDICT, CN_TRANSDICT]
 LANG = ["ja;q=1", "zh-CN,zh;q=1"]
 
 
-def spider_dlsite(info, lang=0):
+def spider_dlsite(info, proxy, lang=0):
     # lang: 0 for Japanese, 1 for Chinese
     dlsite_header = {
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",  # noqa
@@ -36,12 +36,13 @@ def spider_dlsite(info, lang=0):
                    "537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/"
                    "537.36")
     }
+    proxies = {"http":proxy, "https":proxy} if proxy else None
     rjcode = info["rjcode"]   # not list
     url = f"https://www.dlsite.com/maniax/work/=/product_id/{rjcode}.html"
     maxtries = 3
     while maxtries:
         try:
-            res = requests.get(url, headers=dlsite_header, timeout=10)
+            res = requests.get(url, headers=dlsite_header, timeout=10, proxies=proxies)
             break
         except requests.Timeout:
             logger.error(f"<{rjcode}> Timeout, RETRING [{maxtries}]")
@@ -71,7 +72,7 @@ def spider_dlsite(info, lang=0):
     info = process_info(info)
     return info
 
-# def spider_hvdb(info, lang=0):
+# def spider_hvdb(info, proxy, lang=0):
     # """hvdb spider you may want to implement
 
     # `info` is the fetch result of dlsite.

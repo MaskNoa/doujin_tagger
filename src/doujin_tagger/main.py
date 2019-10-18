@@ -28,9 +28,9 @@ logger.addHandler(filelog)
 RJPAT = re.compile(r"(RJ\d+)", flags=re.IGNORECASE)
 
 def worker(args):
-    rjcode, root, dest, cover, lang = args
+    rjcode, root, dest, cover, lang, proxy = args
     a = ArtWork(rjcode, root, dest)
-    a.fetch_and_feed(cover, lang)
+    a.fetch_and_feed(proxy, cover, lang)
     a.save_all()
 
 
@@ -38,7 +38,7 @@ def main():
     banner()
     options = cmd_parser()
     logger.info("starting")
-    work_list = [(rjcode, root, options.dest, options.cover, options.lang)
+    work_list = [(rjcode, root, options.dest, options.cover, options.lang, options.proxy)
                  for rjcode, root in match_path(options.orig, RJPAT)]
     if not work_list:
         logger.info("no match found")

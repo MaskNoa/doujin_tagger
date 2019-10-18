@@ -50,11 +50,8 @@ def cmd_parser():
     if path.splitdrive(options.orig)[0] != path.splitdrive(options.dest)[0]:
         logger.error("orig和dest文件夹不在一个分区")
         exit(1)
+    if options.proxy:
+        logger.info(f"Using Proxy: {options.proxy}")
     logger.debug(f"options is {options}")
+    
     return options
-
-
-
-
-
-

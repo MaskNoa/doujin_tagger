@@ -1,3 +1,4 @@
+import time
 import logging
 
 import requests
@@ -14,7 +15,6 @@ JP_TRANSDICT = {
     "シリーズ名": "series",
 }
 
-# [TODO] Dlsite now support Chinese.
 CN_TRANSDICT = {
     "贩卖日": "date",
     "声优": "artist",
@@ -23,33 +23,37 @@ CN_TRANSDICT = {
     "系列名": "series",
 }
 TRANSDICTS = [JP_TRANSDICT, CN_TRANSDICT]
-LANG = ["ja;q=1", "zh-CN,zh;q=1"]
+LANG_H = ["ja;q=1", "zh-CN,zh;q=1"]
+LANGS = ['JP', 'CN']
 
 
 def spider_dlsite(info, proxy, lang=0):
-    # lang: 0 for Japanese, 1 for Chinese
+    logger.info(f"scraping [DLSITE] [{LANGS[lang]}]")
     dlsite_header = {
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",  # noqa
-    "Accept-Language": LANG[lang],
+    "Accept-Language": LANG_H[lang],
     "Cookies": "adultchecked=1",
     "User-Agent": ("Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/"
                    "537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/"
                    "537.36")
     }
-    proxies = {"http":proxy, "https":proxy} if proxy else None
+    proxies = {"http": proxy, "https": proxy} if proxy else None
     rjcode = info["rjcode"]   # not list
     url = f"https://www.dlsite.com/maniax/work/=/product_id/{rjcode}.html"
     maxtries = 3
     while maxtries:
         try:
-            res = requests.get(url, headers=dlsite_header, timeout=10, proxies=proxies)
+            res = requests.get(url, headers=dlsite_header,
+                               timeout=10, proxies=proxies)
             break
         except requests.Timeout:
             logger.error(f"<{rjcode}> Timeout, RETRING [{maxtries}]")
+            time.sleep(1)
             maxtries -= 1
             continue
         except requests.ConnectionError as e:
             logger.error(repr(e) + f"<{rjcode}> RETRING [{maxtries}]")
+            time.sleep(1)
             maxtries -= 1
             continue
     else:
@@ -72,9 +76,46 @@ def spider_dlsite(info, proxy, lang=0):
     info = process_info(info)
     return info
 
-# def spider_hvdb(info, proxy, lang=0):
-    # """hvdb spider you may want to implement
 
-    # `info` is the fetch result of dlsite.
-    # """
-    # return info
+def spider_hvdb(info, proxy, lang=0):
+    """当dlsite找不到artist爬取hvdb作为补充"""
+
+    if 'artist' in info and not info['artist']:
+        return info
+    logger.info(f"scraping [HVDB]")
+    proxies = {"http": proxy, "https": proxy} if proxy else None
+    rjcode = info["rjcode"][2:]
+    url = f"http://hvdb.me/Dashboard/WorkDetails/{rjcode}"
+    maxtries = 3
+
+    while maxtries:
+        try:
+            res = requests.get(url, timeout=10, proxies=proxies)
+            break
+        except requests.Timeout:
+            logger.error(f"<{rjcode}> Timeout, RETRING [{maxtries}]")
+            time.sleep(1)
+            maxtries -= 1
+            continue
+        except requests.ConnectionError as e:
+            logger.error(repr(e) + f"<{rjcode}> RETRING [{maxtries}]")
+            time.sleep(1)
+            maxtries -= 1
+            continue
+    else:
+        logger.error(f"<{rjcode}> Maxtries Reached")
+        return info
+
+    if res.status_code == 500:
+        logger.error(f"<{rjcode}> NotFound On HVDB")
+        return info
+
+    html = HTML(res.text)
+    pat = html.xpath("//input[@name='CVsString']/@value")
+    if not pat:
+        return info
+    pat = pat[0]
+    # 可能存在声优第一个字符也是ASCII?
+    info['artist'] = [each for each in pat.split(
+        ',') if each and not each[0].isascii()]
+    return info

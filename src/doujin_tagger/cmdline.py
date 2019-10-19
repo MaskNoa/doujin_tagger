@@ -7,6 +7,7 @@ from doujin_tagger import __author__, __version__
 
 logger = logging.getLogger(__name__)
 
+
 def banner():
     print('''
   _____                    _______
@@ -36,8 +37,8 @@ def cmd_parser():
     parser.add_argument("--lang", "-l", type=int, dest="lang", action="store",
                         default=0, help="0 for Japanese(default), 1 for Chinese")
     parser.add_argument("--proxy", type=str, dest="proxy", action="store",
-                        help="proxy, the same as 'requests' module")                   
-                        
+                        help="proxy, the same as 'requests' module")
+
     options = parser.parse_args(sys.argv[1:])
     if not (options.orig and options.dest):
         logger.error("必须提供orig和dest参数")
@@ -53,5 +54,5 @@ def cmd_parser():
     if options.proxy:
         logger.info(f"Using Proxy: {options.proxy}")
     logger.debug(f"options is {options}")
-    
+
     return options

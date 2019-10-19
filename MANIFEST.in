@@ -1,7 +1,7 @@
 graft src/doujin_tagger
 graft test
 
-include tox.ini 
+include tox.ini
 include conftest.py 
 include README.rst
 include README.zh_cn.rst

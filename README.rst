@@ -25,10 +25,11 @@ Usage
 --nocov, -q           do not save cover
 --debug               run in single thread for debug
 --lang LANG, -l LANG  0 for Japanese(default), 1 for Chinese
+--proxy               proxy used for spider(see example below)
 
 usage::
 
-    doutag -o <dir> -d <dir> -q --lang=1
+    doutag -o <dir> -d <dir> -q --lang=1 --proxy=socks5://127.0.0.1:1080
 
 How It Works
 =============
@@ -49,6 +50,12 @@ Attention
 
 ChangeLog
 ==========
+v0.3.0 (2019-10-19)
+-------------------
+* [feat] remove json configuration. use a bash/bat script instead.
+* [feat] add proxy options
+* [feat] scrape hvdb artist info when artist not found in dlsite.
+
 v0.2.0 (2019-8-30)
 -------------------
 * [feat] add rjcode tags

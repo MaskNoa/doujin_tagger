@@ -27,6 +27,7 @@ logger.addHandler(filelog)
 
 RJPAT = re.compile(r"(RJ\d+)", flags=re.IGNORECASE)
 
+
 def worker(args):
     rjcode, root, dest, cover, lang, proxy = args
     a = ArtWork(rjcode, root, dest)

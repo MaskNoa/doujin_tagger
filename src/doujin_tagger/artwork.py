@@ -97,11 +97,7 @@ class ArtWork:
     def fetch_and_feed(self, proxy, cover=True, lang=0):
         """give info fetched by spiders to each `AudioFile`"""
 
-        # info's value must be a list
-        langs = ["JP", "CN"]
-        
         for k, func in self.spiders.items():
-            self.logger.info(f"scraping [{k}] [{langs[lang]}]")
             self.info = func(self.info, proxy, lang)
         for each in self.audios:
             each.feed(self.info)

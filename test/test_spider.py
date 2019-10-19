@@ -36,8 +36,8 @@ params = [
 class TestDlsite:
     @pytest.mark.online
     def test_dlsite_404_online(self, caplog):
-        spider_dlsite(INFO)
-        # set `log_level = INFO` in pytest.ini
+        spider_dlsite(INFO,{})
+        # set `log_level = ERROR` in pytest.ini
         res = [record for record in caplog.records]
         assert len(res) == 1
         assert 'NotFound' in res[0].message
@@ -47,7 +47,7 @@ class TestDlsite:
         resp = requests.Response()
         resp.status_code = 404
         mock_req.return_value = resp
-        spider_dlsite(INFO)
+        spider_dlsite(INFO,{})
         res = [record for record in caplog.records]
         assert len(res) == 1
         assert 'NotFound' in res[0].message
@@ -55,7 +55,7 @@ class TestDlsite:
     @patch('requests.get')
     def test_dlsite_timeout(self, mock_req, caplog):
         mock_req.side_effect = requests.Timeout('mock timeout')
-        spider_dlsite(INFO)
+        spider_dlsite(INFO,{})
         res = [record for record in caplog.records]
         assert len(res) == 4
         assert 'Maxtries' in res.pop().message
@@ -73,6 +73,6 @@ class TestDlsite:
         mock_req.return_value = resp
         mock_req.text = 'haha'
         info = {'rjcode': name[:name.index('.')]}
-        info = spider_dlsite(info)
+        info = spider_dlsite(info,{})
         info.pop('rjcode')
         assert info == expected

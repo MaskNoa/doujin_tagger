@@ -23,7 +23,7 @@ doujin_tagger 是一个同人音声音频的批量标签处理程序.
 --nocov, -q           不保存封面
 --debug               单线程测试用
 --lang LANG, -l LANG  0: 日语标签(默认), 1: 中文标签
---proxy               代理(见下面的举例))
+--proxy               代理(见下面的举例)
 
 使用::
 
@@ -41,7 +41,7 @@ doujin_tagger 是一个同人音声音频的批量标签处理程序.
 
 注意
 =========
-* **删除了使用json保存上次配置的功能,请使用bash/bat处理,查看example.bat
+* **删除了使用json保存上次配置的功能,请使用bash/bat处理,查看example.bat**
 * ``orig`` 和 ``dest`` **必须** 处于同一分区
 * ``orig`` 和 ``dest`` **不能** 一个是另一个的子文件夹甚至同一文件夹
 * **暂时不支持WAV文件**

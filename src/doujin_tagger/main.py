@@ -1,5 +1,4 @@
 import re
-import json
 import logging
 from os import path
 from multiprocessing import Pool, freeze_support
@@ -39,7 +38,8 @@ def main():
     banner()
     options = cmd_parser()
     logger.info("starting")
-    work_list = [(rjcode, root, options.dest, options.cover, options.lang, options.proxy)
+    work_list = [(rjcode, root, options.dest, options.cover,
+                  options.lang, options.proxy)
                  for rjcode, root in match_path(options.orig, RJPAT)]
     if not work_list:
         logger.info("no match found")

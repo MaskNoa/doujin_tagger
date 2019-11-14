@@ -3,7 +3,7 @@ import logging
 
 import requests
 from lxml.etree import HTML
-from doujin_tagger.util import process_info
+from doujin_tagger.util import process_dlsite_info
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +26,6 @@ TRANSDICTS = [JP_TRANSDICT, CN_TRANSDICT]
 LANG_H = ["ja;q=1", "zh-CN,zh;q=1"]
 LANGS = ['JP', 'CN']
 
-
 def spider_dlsite(info, proxy, lang=0):
     logger.info(f"scraping [DLSITE] [{LANGS[lang]}]")
     dlsite_header = {
@@ -38,7 +37,7 @@ def spider_dlsite(info, proxy, lang=0):
                    "537.36")
     }
     proxies = {"http": proxy, "https": proxy} if proxy else None
-    rjcode = info["rjcode"]   # not list
+    rjcode = info["rjcode"]
     url = f"https://www.dlsite.com/maniax/work/=/product_id/{rjcode}.html"
     maxtries = 3
     while maxtries:
@@ -72,8 +71,12 @@ def spider_dlsite(info, proxy, lang=0):
             info[TRANSDICTS[lang][info_name]] = info_attr
     info["maker"] = html.xpath("//*[@class='maker_name']/a/text()")
     info["album"] = html.xpath("//*[@id='work_name']/a/text()")
-    info["image_url"] = html.xpath("//img[@itemprop='image']/@src")
-    info = process_info(info)
+    img_url = html.xpath("//img[@itemprop='image']/@src")
+    if "no_img" in img_url:
+        logger.debug("No Cover Found On Dlsite")
+    else:
+        info["image_url"] = img_url
+    info = process_dlsite_info(info)
     return info
 
 

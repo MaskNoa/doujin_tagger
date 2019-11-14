@@ -125,7 +125,9 @@ class AudioFile(DictMixin):
 
         do not save the change immediately. use .save() instead"""
         raise NotImplementedError
-
+    
+    def delete_all_tags(self):
+        raise NotImplementedError
 
 class AudioFileError(Exception):
     """Base error for AudioFile, mostly IO/parsing related operations"""

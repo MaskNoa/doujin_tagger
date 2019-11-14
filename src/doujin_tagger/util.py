@@ -51,32 +51,29 @@ def dl_cover(url):
             continue
     else:
         logger.error("REACH MAX RETRIES! DL Fail! ABORT!")
-        return b""
+        return b''
     return res.content
 
 
-def process_info(info):
+def process_dlsite_info(info):
     for key, val in info.items():
         if key == "date":
-            val = val[0]
             try:
                 date_tuple = re.search(r"(\d+)年(\d+)月(\d+)日", val).groups()
                 fmt_date = datetime.datetime(*map(int, date_tuple))
                 val = fmt_date.strftime("%Y-%m")
-                info[key] = [val, ]
+                info[key] = val
             except (AttributeError, TypeError):
                 logger.warning("PROCESS DATE ERROR")
-                info[key] = ["", ]
+                info[key] = ""
         elif key in ("tags", "artist"):
             new = []
-            for each in val:
+            for each in val.split('\n'):
                 temp = each.strip()
                 each = each.replace("/", "").strip()
                 if each:
                     new.append(temp)
             info[key] = new
-        else:
-            info[key] = val
     return info
 
 

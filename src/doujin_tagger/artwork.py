@@ -10,7 +10,7 @@ from doujin_tagger.id3 import ID3File, MP3File  # noqa
 from doujin_tagger.mp4 import MP4File  # noqa
 from doujin_tagger.util import dl_cover, find_inner_most
 from doujin_tagger.xiph import *  # noqa
-from doujin_tagger.audio import AudioFile
+from doujin_tagger.audio import AudioFile, DictMixin
 from doujin_tagger.image import EmbeddedImage
 
 logger = logging.getLogger(__name__)
@@ -22,7 +22,6 @@ logger = logging.getLogger(__name__)
 REFMT_REGISTRY = "|".join(AudioFile._registry)
 AUDIO_PAT = re.compile(fr".*\.({REFMT_REGISTRY})$")
 UNSUPPORT_PAT = re.compile(r".*\.(wav|ape)$")
-NO_IMAGE_PAT = re.compile(r"no_img")
 ILLEGAL_PAT = re.compile(r"[\\/:*?\"<>|\r\n\u30FB\u301c\u2600-\u26ff]+")
 
 
@@ -52,14 +51,14 @@ class ArtWork:
         self.audios = []  # AufioFile objs
         self.has_unsupport_fmt = False
         self._update_audios()
+        self.cover = b''  # store binary data of image
         # <doujin> tag is always set to "1" to distinguish with normal music
-        self.info = {"doujin": "1", "rjcode": rjcode}
-
+        self.info = DictMixin({"doujin":"1", "rjcode":rjcode})
+        
     def _update_audios(self):
         for root, _, files in os.walk(self.work_path):
             for eachfile in files:
                 if UNSUPPORT_PAT.match(eachfile):
-                    # private,DO NOT use it as a public member
                     self.has_unsupport_fmt = True
                     self.audios.clear()
                 elif AUDIO_PAT.match(eachfile):
@@ -72,7 +71,7 @@ class ArtWork:
     def _recur_del_and_move(self):
         # make sure this is the last thing to do
         # because we don't want to keep track of the filenames after moving
-        dir_name = f"{self.rjcode} {self.info['album'][0]}"
+        dir_name = f"{self.rjcode} {self.info['album']}"
         dir_name = ILLEGAL_PAT.sub("", dir_name)
         full_name = self.dest / dir_name
         path_to_move = find_inner_most(self.work_path)
@@ -96,47 +95,33 @@ class ArtWork:
 
     def fetch_and_feed(self, proxy, cover=True, lang=0):
         """give info fetched by spiders to each `AudioFile`"""
-
+        # spider 是一个dict似乎没用
+        # 另外,这种机制真的好吗,不过似乎可以先放着,等学会了scrapy再说
         for k, func in self.spiders.items():
             self.info = func(self.info, proxy, lang)
         for each in self.audios:
             each.feed(self.info)
         if cover:
-            self.logger.info("getting cover")
-            self._fetch_cover()
-
-    def _fetch_cover(self):
-        image_url = self.info.get("image_url")  # image_url: list
-        if not image_url:
-            self.logger.warning("IMAGE_URL ATTR NOT EXIST")
-        elif NO_IMAGE_PAT.search(image_url[0]):
-            self.logger.warning("WORK HAS NO COVER")
-        else:
-            bytesobj = dl_cover(image_url[0])
-            if not bytesobj:
-                # use -1 to flag dl_cover error
-                # we must abort latter process
-                return -1
-            self.info["cover"] = bytesobj
-        return 1
+            self.logger.debug("getting cover")
+            image_url = self.info.get("image_url")
+            if not image_url:
+                self.logger.warning("Cover Not Found")
+            else:
+                self.cover = dl_cover(image_url)
 
     def delete_all(self):
         """delete all files' tags in this album"""
         if self.has_unsupport_fmt:
-            self.logger.error("HAS UNSUPPORT FMT, ABORT")
+            self.logger.error("UNSUPPORT FMT FOUND")
             return
         for each in self.audios:
             each.delete_all_tags()
-        self.logger.info(f"[{len(self)}] files' info deleted")
+        self.logger.debug(f"[{len(self)}] files info deleted")
 
     def save_all(self):
         """save infos to all files in this album and move to dest"""
         temp = {k: v for k, v in self.info.items() if k != 'cover'}
         self.logger.debug(f"self.info is {temp}")
-        # if we ignore wav/ape... files and not abort,then files moving to dest
-        # as if save_all works successfully
-        # this files are totally not seen in foobar2k's database
-        # with `%DOUJIN% PRESENT` filter on
         if self.has_unsupport_fmt:
             self.logger.error("UNSUPPORT FMT FOUND")
             return False
@@ -147,14 +132,12 @@ class ArtWork:
             self.logger.error("INFO NOT COMPLETE")
             return False
 
-        coverobj = self.info.get("cover")
-        if coverobj == -1:
+        if not self.cover:
             return False
         for each in self.audios:
             try:
-                if coverobj:
-                    img = EmbeddedImage(coverobj)
-                    each.set_image(img)
+                img = EmbeddedImage(self.cover)
+                each.set_image(img)
                 each.save()
             except Exception:
                 self.logger.error("EXCEPTION WHEN SAVING, ABORT!")

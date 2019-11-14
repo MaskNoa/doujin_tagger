@@ -53,8 +53,8 @@ class ArtWork:
         self._update_audios()
         self.cover = b''  # store binary data of image
         # <doujin> tag is always set to "1" to distinguish with normal music
-        self.info = DictMixin({"doujin":"1", "rjcode":rjcode})
-        
+        self.info = DictMixin({"doujin": "1", "rjcode": rjcode})
+
     def _update_audios(self):
         for root, _, files in os.walk(self.work_path):
             for eachfile in files:

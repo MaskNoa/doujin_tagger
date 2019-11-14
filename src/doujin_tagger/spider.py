@@ -26,6 +26,9 @@ TRANSDICTS = [JP_TRANSDICT, CN_TRANSDICT]
 LANG_H = ["ja;q=1", "zh-CN,zh;q=1"]
 LANGS = ['JP', 'CN']
 
+# info now is DictMixin
+
+
 def spider_dlsite(info, proxy, lang=0):
     logger.info(f"scraping [DLSITE] [{LANGS[lang]}]")
     dlsite_header = {

@@ -11,7 +11,8 @@ class DictMixin(MutableMapping):
         dict_ = args[0] if args else None
         if dict_ is not None:
             self.update(dict_)
-        self.update(kwargs)
+        for k, v in kwargs.items():
+            self.add(k, v)  # 如果key在dict_里存在，这里是add进去而不是覆盖
 
     def __getitem__(self, key):
         try:
@@ -31,15 +32,23 @@ class DictMixin(MutableMapping):
         return key in self._data
 
     def __setitem__(self, key, value):
-        # always call `add` to convert value into string joined with \n
-        if hasattr(value, "__iter__") and not isinstance(value, str):
-            for each in value:
-                self.add(key, str(each))
-        else:
-            self.add(key, str(value))
+        self._data[key] = self._list2str(value)
 
     def __len__(self):
         return len(self._data)
+
+    def _list2str(self, value):
+        if not isinstance(value, str) and hasattr(value, "__iter__"):
+            it = (str(each) for each in value)
+            return '\n'.join(it)
+        else:
+            return str(value)
+
+    def add(self, key, value):
+        if key not in self:
+            self[key] = self._list2str(value)
+        else:
+            self[key] = self._data[key] + "\n" + self._list2str(value)
 
     def __iter__(self):
         return iter(self._data)
@@ -51,14 +60,6 @@ class DictMixin(MutableMapping):
         """return value in list"""
         val = self._data.get(key)
         return val.strip().split("\n") if val else []
-
-    def add(self, key, value):
-        """store dict's value in string: info1\ninfo2"""
-
-        if key not in self:
-            self._data[key] = value
-        else:
-            self._data[key] = self._data[key] + "\n" + value
 
     def remove(self, key, value=None):
         # multi-value is stored by str separated by \n. e.g. '1\n2'
@@ -125,9 +126,10 @@ class AudioFile(DictMixin):
 
         do not save the change immediately. use .save() instead"""
         raise NotImplementedError
-    
+
     def delete_all_tags(self):
         raise NotImplementedError
+
 
 class AudioFileError(Exception):
     """Base error for AudioFile, mostly IO/parsing related operations"""

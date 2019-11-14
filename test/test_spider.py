@@ -3,11 +3,12 @@ from unittest.mock import Mock, patch
 
 import pytest
 import requests
+from doujin_tagger.audio import DictMixin
 from doujin_tagger.spider import spider_dlsite
 
 DIR = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(DIR, 'data')
-INFO = {"rjcode": "RJ0"}
+INFO = DictMixin({"rjcode": "RJ0"})
 
 params = [
     ("RJ234446.html", {
@@ -72,7 +73,7 @@ class TestDlsite:
         resp.text = content
         mock_req.return_value = resp
         mock_req.text = 'haha'
-        info = {'rjcode': name[:name.index('.')]}
+        info = DictMixin({'rjcode': name[:name.index('.')]})
         info = spider_dlsite(info, {})
         info.pop('rjcode')
-        assert info == expected
+        assert info.list_repr() == expected

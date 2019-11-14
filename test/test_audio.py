@@ -22,6 +22,9 @@ class TestDictMixin:
 
     def test_setitem(self):
         assert self.f1['a'] == '1\n3'
+        self.f1['a'] = 4
+        # 单独的=操作,覆盖原来的值，而不是类似add
+        assert self.f1['a'] == '4'
 
     def test_add(self):
         self.f1.add('b', 'add1')

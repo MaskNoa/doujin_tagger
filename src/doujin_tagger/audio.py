@@ -46,9 +46,9 @@ class DictMixin(MutableMapping):
 
     def add(self, key, value):
         if key not in self:
-            self[key] = self._list2str(value)
+            self._data[key] = self._list2str(value)
         else:
-            self[key] = self._data[key] + "\n" + self._list2str(value)
+            self._data[key] = self._data[key] + "\n" + self._list2str(value)
 
     def __iter__(self):
         return iter(self._data)

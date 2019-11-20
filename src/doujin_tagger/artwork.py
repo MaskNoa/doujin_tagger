@@ -120,11 +120,10 @@ class ArtWork:
 
     def save_all(self):
         """save infos to all files in this album and move to dest"""
-        temp = {k: v for k, v in self.info.items() if k != 'cover'}
-        self.logger.debug(f"self.info is {temp}")
         if self.has_unsupport_fmt:
             self.logger.error("UNSUPPORT FMT FOUND")
             return False
+        self.logger.debug(f"self.info is {self.info}")
         if not self.audios:
             self.logger.error("AUDIOS NOT FOUND")
             return False

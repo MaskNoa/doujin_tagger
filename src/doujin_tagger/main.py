@@ -1,7 +1,7 @@
 import re
 import logging
 from os import path
-from multiprocessing import Pool, freeze_support
+import concurrent.futures
 
 from doujin_tagger.util import match_path
 from doujin_tagger.artwork import ArtWork
@@ -49,10 +49,10 @@ def main():
         for args in work_list:
             worker(args)
     else:
-        with Pool() as pool:
-            pool.map(worker, work_list)
+        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as e:
+            for args in work_list:
+                e.submit(worker,args)
 
 
 if __name__ == '__main__':
-    freeze_support()
     main()

@@ -9,7 +9,7 @@ from pathlib import Path
 import mutagen
 import requests
 
-from .audio import MutagenBug, AudioFileError
+from doujin_tagger.audio import MutagenBug, AudioFileError
 
 logger = logging.getLogger(__name__)
 

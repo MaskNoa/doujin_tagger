@@ -30,6 +30,8 @@ RJPAT = re.compile(r"(RJ\d+)", flags=re.IGNORECASE)
 def worker(args):
     rjcode, root, dest, cover, lang, proxy = args
     a = ArtWork(rjcode, root, dest)
+    if a.update_audios() == 1:
+        return
     a.fetch_and_feed(proxy, cover, lang)
     a.delete_all()  # 原来的标签可能乱码，全部删除
     a.save_all()

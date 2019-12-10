@@ -10,7 +10,7 @@ from doujin_tagger.id3 import ID3File, MP3File  # noqa
 from doujin_tagger.mp4 import MP4File  # noqa
 from doujin_tagger.util import dl_cover, find_inner_most
 from doujin_tagger.xiph import *  # noqa
-from doujin_tagger.audio import AudioFile, DictMixin
+from doujin_tagger.audio import AudioFile, DictMixin, AudioFileError
 from doujin_tagger.image import EmbeddedImage
 
 logger = logging.getLogger(__name__)
@@ -49,21 +49,24 @@ class ArtWork:
         self.dest = Path(dest)
         self.logger = MyLogger(logger, {"ref": self})
         self.audios = []  # AufioFile objs
-        self.has_unsupport_fmt = False
-        self._update_audios()
         self.cover = b''  # store binary data of image
         # <doujin> tag is always set to "1" to distinguish with normal music
         self.info = DictMixin({"doujin": "1", "rjcode": rjcode})
 
-    def _update_audios(self):
+    def update_audios(self):
         for root, _, files in os.walk(self.work_path):
             for eachfile in files:
                 if UNSUPPORT_PAT.match(eachfile):
-                    self.has_unsupport_fmt = True
-                    self.audios.clear()
+                    return 1   # 1 for error
                 elif AUDIO_PAT.match(eachfile):
                     full_path = os.path.join(root, eachfile)
-                    self.audios.append(AudioFile(full_path))
+                    try:
+                        self.audios.append(AudioFile(full_path))
+                    except AudioFileError as e:
+                        self.logger.error(f"LOADING ERROR --> {eachfile}")
+                        self.logger.debug(traceback.format_exc())
+                        return 1
+        return 0
 
     def __len__(self):
         return len(self.audios)
@@ -79,6 +82,10 @@ class ArtWork:
             path_to_move.rename(full_name)
         except FileExistsError:
             self.logger.error("SAME DIR IN DEST FOUND!")
+            return False
+        except Exception as e:
+            self.logger.error(f"{repr(e)}")
+            self.logger.debug(traceback.format_exc())
             return False
         # rescan and remove all empty dir
         if self.work_path.exists():
@@ -111,18 +118,13 @@ class ArtWork:
 
     def delete_all(self):
         """delete all files' tags in this album"""
-        if self.has_unsupport_fmt:
-            self.logger.error("UNSUPPORT FMT FOUND")
-            return
         for each in self.audios:
             each.delete_all_tags()
         self.logger.debug(f"[{len(self)}] files info deleted")
 
     def save_all(self):
         """save infos to all files in this album and move to dest"""
-        if self.has_unsupport_fmt:
-            self.logger.error("UNSUPPORT FMT FOUND")
-            return False
+        self.logger.info("SAVING")
         self.logger.debug(f"self.info is {self.info}")
         if not self.audios:
             self.logger.error("AUDIOS NOT FOUND")

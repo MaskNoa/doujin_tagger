@@ -6,7 +6,10 @@ import concurrent.futures
 from doujin_tagger.util import match_path
 from doujin_tagger.artwork import ArtWork
 from doujin_tagger.cmdline import banner, cmd_parser
+import time
 
+
+logging.logThreads = 0
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 filelog = logging.FileHandler(
@@ -37,6 +40,34 @@ def worker(args):
     a.save_all()
 
 
+def multi(work_list):
+    def fn(future):
+        if not future.cancelled():
+            future.result()
+    executor =  concurrent.futures.ThreadPoolExecutor(5)
+    future_list = []
+    for url in work_list:
+        future = executor.submit(worker,url)
+        future.add_done_callback(fn)
+        future_list.append(future)
+    while True:
+        try:
+            time.sleep(1)
+            if all(e.done() for e in future_list):
+                break
+        except KeyboardInterrupt:
+            count = 0
+            done = 0
+            for e in future_list:
+                if not e.done():
+                    count += 1
+                    e.cancel()
+                else:
+                    done += 1
+            logger.info(f'cancel {count} work, done {done} work')
+            break
+
+     
 def main():
     banner()
     options = cmd_parser()
@@ -47,13 +78,7 @@ def main():
     if not work_list:
         logger.info("no match found")
         return
-    if options.debug:
-        for args in work_list:
-            worker(args)
-    else:
-        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as e:
-            for args in work_list:
-                e.submit(worker,args)
+    multi(work_list)
 
 
 if __name__ == '__main__':

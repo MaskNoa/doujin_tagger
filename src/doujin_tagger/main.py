@@ -1,39 +1,23 @@
 import re
 import logging
-from os import path
 import concurrent.futures
 
+import doujin_tagger.logger  # noqa
 from doujin_tagger.util import match_path
 from doujin_tagger.artwork import ArtWork
 from doujin_tagger.cmdline import banner, cmd_parser
 import time
+from tqdm import tqdm
 
 
-logging.logThreads = 0
-logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
-filelog = logging.FileHandler(
-    path.expanduser("~/dt_info.txt"), encoding="utf-8")
-filelog.setLevel(logging.DEBUG)
-fileformatter = logging.Formatter(
-    "%(asctime)s %(name)-8s %(funcName)-13s| %(levelname)-8s | %(message)s",
-    datefmt="[%Y-%m-%d %H:%M]")
-filelog.setFormatter(fileformatter)
-ch = logging.StreamHandler()
-chformatter = logging.Formatter(
-    "%(funcName)-16s| %(levelname)-8s | %(message)s")
-ch.setFormatter(chformatter)
-ch.setLevel(logging.INFO)
-logger.addHandler(ch)
-logger.addHandler(filelog)
-
+logger = logging.getLogger("doutag")
 RJPAT = re.compile(r"(RJ\d+)", flags=re.IGNORECASE)
 
 
 def worker(args):
     rjcode, root, dest, cover, lang, proxy = args
     a = ArtWork(rjcode, root, dest)
-    if a.update_audios() == 1:
+    if not a.update_audios():
         return
     a.fetch_and_feed(proxy, cover, lang)
     a.delete_all()  # 原来的标签可能乱码，全部删除
@@ -41,14 +25,17 @@ def worker(args):
 
 
 def multi(work_list):
-    def fn(future):
+    pbar = tqdm(total=len(work_list), dynamic_ncols=True, ascii=True)
+
+    def callback_fn(future):
         if not future.cancelled():
             future.result()
-    executor =  concurrent.futures.ThreadPoolExecutor(5)
+            pbar.update(1)
+    executor = concurrent.futures.ThreadPoolExecutor(5)
     future_list = []
     for url in work_list:
-        future = executor.submit(worker,url)
-        future.add_done_callback(fn)
+        future = executor.submit(worker, url)
+        future.add_done_callback(callback_fn)
         future_list.append(future)
     while True:
         try:
@@ -56,6 +43,8 @@ def multi(work_list):
             if all(e.done() for e in future_list):
                 break
         except KeyboardInterrupt:
+            pbar.close()
+            logger.critical("wait for threads to quit")
             count = 0
             done = 0
             for e in future_list:
@@ -67,7 +56,7 @@ def multi(work_list):
             logger.info(f'cancel {count} work, done {done} work')
             break
 
-     
+
 def main():
     banner()
     options = cmd_parser()

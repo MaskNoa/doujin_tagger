@@ -1,12 +1,8 @@
-import logging
-
 import mutagen
 from mutagen.mp3 import MP3
 from doujin_tagger.util import translate_errors
 from doujin_tagger.audio import AudioFile
 from doujin_tagger.image import COVER_FRONT
-
-logger = logging.getLogger(__name__)
 
 
 class ID3File(AudioFile, ext=None):

@@ -1,5 +1,4 @@
 import base64
-import logging
 
 from mutagen.flac import FLAC, Picture
 from mutagen.oggflac import OggFLAC
@@ -11,7 +10,6 @@ from doujin_tagger.util import translate_errors
 from doujin_tagger.audio import AudioFile
 from doujin_tagger.image import COVER_FRONT
 
-logger = logging.getLogger(__name__)
 
 __all__ = ["OggFile", "OggFLACFile", "OggSpeexFile", "OggTheoraFile",
            "OggOpusFile", "FLACFile"]

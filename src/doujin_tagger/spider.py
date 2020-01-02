@@ -5,7 +5,7 @@ import requests
 from lxml.etree import HTML
 from doujin_tagger.util import process_dlsite_info
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("doutag.spider")
 
 JP_TRANSDICT = {
     "販売日": "date",
@@ -49,21 +49,21 @@ def spider_dlsite(info, proxy, lang=0):
                                timeout=10, proxies=proxies)
             break
         except requests.Timeout:
-            logger.error(f"<{rjcode}> Timeout, RETRING [{maxtries}]")
+            logger.warning(f"<{rjcode}> Timeout, RETRING [{maxtries}]")
             time.sleep(1)
             maxtries -= 1
             continue
         except requests.ConnectionError as e:
-            logger.error(repr(e) + f"<{rjcode}> RETRING [{maxtries}]")
+            logger.warning(repr(e) + f"<{rjcode}> RETRING [{maxtries}]")
             time.sleep(1)
             maxtries -= 1
             continue
     else:
-        logger.error(f"<{rjcode}> Maxtries Reached")
+        logger.warning(f"<{rjcode}> Maxtries Reached")
         return info
 
     if res.status_code == 404:  # status_code's type is int, not str
-        logger.error(f"<{rjcode}> NotFound On Dlsite")
+        logger.warning(f"<{rjcode}> NotFound On Dlsite")
         return info
 
     html = HTML(res.text)
@@ -99,21 +99,21 @@ def spider_hvdb(info, proxy, lang=0):
             res = requests.get(url, timeout=10, proxies=proxies)
             break
         except requests.Timeout:
-            logger.error(f"<{rjcode}> Timeout, RETRING [{maxtries}]")
+            logger.warning(f"<{rjcode}> Timeout, RETRING [{maxtries}]")
             time.sleep(1)
             maxtries -= 1
             continue
         except requests.ConnectionError as e:
-            logger.error(repr(e) + f"<{rjcode}> RETRING [{maxtries}]")
+            logger.warning(repr(e) + f"<{rjcode}> RETRING [{maxtries}]")
             time.sleep(1)
             maxtries -= 1
             continue
     else:
-        logger.error(f"<{rjcode}> Maxtries Reached")
+        logger.warning(f"<{rjcode}> Maxtries Reached")
         return info
 
     if res.status_code == 500:
-        logger.error(f"<{rjcode}> NotFound On HVDB")
+        logger.warning(f"<{rjcode}> NotFound On HVDB")
         return info
 
     html = HTML(res.text)

@@ -5,7 +5,7 @@ from argparse import ArgumentParser
 
 from doujin_tagger import __author__, __version__
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("doutag.cmdline")
 
 
 def banner():

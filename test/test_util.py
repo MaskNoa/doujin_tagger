@@ -25,7 +25,7 @@ def test_process_dlsite_info():
     info_date = DictMixin({'date': ['2019年1月1日']})
     info_tags = DictMixin(
         {'tags': ['school', ' / ', 'ear cleaning  ',
-         ' \n /', ' / \n /', 'pure/love'], })
+                  ' \n /', ' / \n /', 'pure/love'], })
     after_date = process_dlsite_info(info_date)
     assert after_date.tolist('date') == ['2019-01', ]
     after_tags = process_dlsite_info(info_tags)

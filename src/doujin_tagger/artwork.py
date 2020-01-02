@@ -13,7 +13,7 @@ from doujin_tagger.xiph import *  # noqa
 from doujin_tagger.audio import AudioFile, DictMixin, AudioFileError
 from doujin_tagger.image import EmbeddedImage
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("doutag.artwork")
 
 # \u30FB : Katakana Middle Dot
 # \u301c : Wave Dash
@@ -57,7 +57,8 @@ class ArtWork:
         for root, _, files in os.walk(self.work_path):
             for eachfile in files:
                 if UNSUPPORT_PAT.match(eachfile):
-                    return 1   # 1 for error
+                    self.logger.error("UNSUPPORT FMT FOUND")
+                    return False
                 elif AUDIO_PAT.match(eachfile):
                     full_path = os.path.join(root, eachfile)
                     try:
@@ -65,8 +66,11 @@ class ArtWork:
                     except AudioFileError as e:
                         self.logger.error(f"LOADING ERROR --> {eachfile}")
                         self.logger.debug(traceback.format_exc())
-                        return 1
-        return 0
+                        return False
+        if not self.audios:
+            self.logger.error("AUDIOS NOT FOUND")
+            return False
+        return True
 
     def __len__(self):
         return len(self.audios)
@@ -124,13 +128,10 @@ class ArtWork:
 
     def save_all(self):
         """save infos to all files in this album and move to dest"""
-        self.logger.info("SAVING")
         self.logger.debug(f"self.info is {self.info}")
-        if not self.audios:
-            self.logger.error("AUDIOS NOT FOUND")
-            return False
+
         if not self._check_field():
-            self.logger.error("INFO NOT COMPLETE")
+            self.logger.error("INFO UNCOMPLETE, CHECK SPIDER LOG")
             return False
 
         if not self.cover:
@@ -147,6 +148,6 @@ class ArtWork:
         else:
             # if no error
             if self._recur_del_and_move():
-                self.logger.info(f"Success! Saved [{len(self)}]")
+                # self.logger.info(f"Success! Saved [{len(self)}]")
                 return True
         return False

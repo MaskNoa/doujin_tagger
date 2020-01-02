@@ -30,7 +30,7 @@ setup(
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     ],
     setup_requires=['pytest-runner',],
-    install_requires=['requests', 'lxml', 'mutagen', 'pillow'],
+    install_requires=['requests', 'lxml', 'mutagen', 'pillow', 'tqdm'],
     tests_require=["pytest", "pytest-cov", "testfixtures"],
     include_package_data=True,
     zip_safe=False,

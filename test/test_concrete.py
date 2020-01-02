@@ -1,11 +1,11 @@
 import os
 
 import pytest
+from doujin_tagger.audio import DictMixin
 from doujin_tagger.id3 import ID3File, MP3File
+from doujin_tagger.image import EmbeddedImage
 from doujin_tagger.mp4 import MP4File
 from doujin_tagger.xiph import FLACFile
-from doujin_tagger.audio import DictMixin
-from doujin_tagger.image import EmbeddedImage
 
 DIR = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(DIR, 'data')

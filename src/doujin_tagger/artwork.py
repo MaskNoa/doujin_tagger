@@ -1,17 +1,17 @@
+import logging
 import os
 import re
 import shutil
-import logging
 import traceback
 from pathlib import Path
 
 from doujin_tagger import spider
+from doujin_tagger.audio import AudioFile, DictMixin
 from doujin_tagger.id3 import ID3File, MP3File  # noqa
-from doujin_tagger.mp4 import MP4File  # noqa
-from doujin_tagger.util import dl_cover, find_inner_most
-from doujin_tagger.xiph import *  # noqa
-from doujin_tagger.audio import AudioFile, DictMixin, AudioFileError
 from doujin_tagger.image import EmbeddedImage
+from doujin_tagger.mp4 import MP4File  # noqa
+from doujin_tagger.util import AudioFileError, dl_cover, find_inner_most
+from doujin_tagger.xiph import *  # noqa
 
 logger = logging.getLogger("doutag.artwork")
 

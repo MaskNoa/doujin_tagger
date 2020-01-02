@@ -1,6 +1,6 @@
-from doujin_tagger.util import translate_errors
-from doujin_tagger.audio import AudioFile, AudioFileError
+from doujin_tagger.audio import AudioFile
 from doujin_tagger.mp4_patch import MP4, MP4Cover
+from doujin_tagger.util import AudioFileError, translate_errors
 
 
 class MP4File(AudioFile, ext=["mp4", "m4a", "m4v", "3gp", "3g2", "3gp2"]):

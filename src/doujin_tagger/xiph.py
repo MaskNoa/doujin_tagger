@@ -1,15 +1,14 @@
 import base64
 
+from doujin_tagger.audio import AudioFile
+from doujin_tagger.image import COVER_FRONT
+from doujin_tagger.util import translate_errors
 from mutagen.flac import FLAC, Picture
 from mutagen.oggflac import OggFLAC
 from mutagen.oggopus import OggOpus
 from mutagen.oggspeex import OggSpeex
 from mutagen.oggtheora import OggTheora
 from mutagen.oggvorbis import OggVorbis
-from doujin_tagger.util import translate_errors
-from doujin_tagger.audio import AudioFile
-from doujin_tagger.image import COVER_FRONT
-
 
 __all__ = ["OggFile", "OggFLACFile", "OggSpeexFile", "OggTheoraFile",
            "OggOpusFile", "FLACFile"]

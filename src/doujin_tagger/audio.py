@@ -129,11 +129,3 @@ class AudioFile(DictMixin):
 
     def delete_all_tags(self):
         raise NotImplementedError
-
-
-class AudioFileError(Exception):
-    """Base error for AudioFile, mostly IO/parsing related operations"""
-
-
-class MutagenBug(AudioFileError):
-    """Raised in is caused by a mutagen bug, so we can highlight it"""

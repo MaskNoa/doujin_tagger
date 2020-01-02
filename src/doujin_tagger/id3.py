@@ -1,8 +1,8 @@
 import mutagen
-from mutagen.mp3 import MP3
-from doujin_tagger.util import translate_errors
 from doujin_tagger.audio import AudioFile
 from doujin_tagger.image import COVER_FRONT
+from doujin_tagger.util import translate_errors
+from mutagen.mp3 import MP3
 
 
 class ID3File(AudioFile, ext=None):

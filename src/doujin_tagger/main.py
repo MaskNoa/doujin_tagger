@@ -1,14 +1,13 @@
-import re
-import logging
 import concurrent.futures
+import logging
+import re
+import time
 
 import doujin_tagger.logger  # noqa
-from doujin_tagger.util import match_path
 from doujin_tagger.artwork import ArtWork
 from doujin_tagger.cmdline import banner, cmd_parser
-import time
+from doujin_tagger.util import match_path
 from tqdm import tqdm
-
 
 logger = logging.getLogger("doutag")
 RJPAT = re.compile(r"(RJ\d+)", flags=re.IGNORECASE)

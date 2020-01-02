@@ -1,6 +1,7 @@
 import logging
-from tqdm import tqdm
 from os import path
+
+from tqdm import tqdm
 
 logging.logThreads = 0
 logging.getLogger("requests").setLevel(logging.WARNING)

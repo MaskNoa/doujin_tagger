@@ -1,7 +1,7 @@
-import sys
 import logging
-from os import path
+import sys
 from argparse import ArgumentParser
+from os import path
 
 from doujin_tagger import __author__, __version__
 

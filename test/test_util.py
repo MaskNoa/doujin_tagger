@@ -1,11 +1,11 @@
+import logging
 import os
 import re
-import logging
 
 import pytest
 from doujin_tagger.audio import DictMixin
-from doujin_tagger.util import (dl_cover, match_path, process_dlsite_info,
-                                find_inner_most)
+from doujin_tagger.util import (dl_cover, find_inner_most, match_path,
+                                process_dlsite_info)
 
 logging.basicConfig(level=logging.DEBUG)
 

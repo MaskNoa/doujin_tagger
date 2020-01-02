@@ -1,9 +1,9 @@
-import time
 import logging
+import time
 
 import requests
-from lxml.etree import HTML
 from doujin_tagger.util import process_dlsite_info
+from lxml.etree import HTML
 
 logger = logging.getLogger("doutag.spider")
 

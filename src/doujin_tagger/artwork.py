@@ -141,12 +141,14 @@ class ArtWork:
             self.logger.error("INFO UNCOMPLETE, CHECK SPIDER LOG")
             return False
 
-        if not self.cover:
-            return False
+        # temporary resolution: continue if cover not found.
+        # if not self.cover:
+            # return False
         for each in self.audios:
             try:
-                img = EmbeddedImage(self.cover)
-                each.set_image(img)
+                if self.cover:
+                    img = EmbeddedImage(self.cover)
+                    each.set_image(img)
                 each.save()
             except Exception:
                 self.logger.error("EXCEPTION WHEN SAVING, ABORT!")

@@ -58,7 +58,11 @@ class ArtWork:
         self.audios = []  # AufioFile objs
         self.cover = b''  # store binary data of image
         # <doujin> tag is always set to "1" to distinguish with normal music
-        self.info = DictMixin({"doujin": "1", "rjcode": rjcode})
+        self.info = DictMixin({
+            "doujin": "1",
+            "rjcode": rjcode,
+            "comment":
+            "Tagged By github.com/maybeRainH/doujin_tagger"})
 
     def update_audios(self):
         for root, _, files in os.walk(self.work_path):
@@ -89,6 +93,7 @@ class ArtWork:
         dir_name = ILLEGAL_PAT.sub("", dir_name)
         full_name = self.dest / dir_name
         path_to_move = find_inner_most(self.work_path)
+        self.logger.info(f"moving to {full_name}")
         try:
             path_to_move.rename(full_name)
         except FileExistsError:
@@ -122,7 +127,7 @@ class ArtWork:
         if cover:
             self.logger.debug("getting cover")
             image_url = self.info.get("image_url")
-            if not image_url:
+            if not image_url or "no_img" in image_url:
                 self.logger.warning("Cover Not Found")
             else:
                 self.cover = dl_cover(image_url)

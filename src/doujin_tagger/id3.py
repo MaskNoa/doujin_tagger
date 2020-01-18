@@ -6,7 +6,7 @@
 # (at your option) any later version.
 #
 # Credits:
-# The codes in this file is largely copied and modified from:
+# The code in this file is largely copied and modified from:
 # https://github.com/quodlibet/quodlibet/blob/master/quodlibet/quodlibet/formats/_id3.py
 # https://github.com/quodlibet/quodlibet/blob/master/quodlibet/quodlibet/formats/mp3.py
 
@@ -22,6 +22,7 @@ class ID3File(AudioFile, ext=None):
         "TPE1": "artist",
         "TALB": "album",
         "TDRC": "date",
+        "COMM": "comment",
     }
     TXXX_MAP = {
         "DOUJIN": "doujin",

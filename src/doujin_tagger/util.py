@@ -6,7 +6,7 @@
 # (at your option) any later version.
 #
 # Credits:
-# The codes in this file is largely copied and modified from:
+# The code in this file is largely copied and modified from:
 # https://github.com/quodlibet/quodlibet/blob/master/quodlibet/quodlibet/formats/_audio.py
 
 import contextlib

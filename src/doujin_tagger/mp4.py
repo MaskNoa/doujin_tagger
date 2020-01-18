@@ -6,7 +6,7 @@
 # (at your option) any later version.
 #
 # Credits:
-# The codes in this file is largely copied and modified from:
+# The code in this file is largely copied and modified from:
 # https://github.com/quodlibet/quodlibet/blob/master/quodlibet/quodlibet/formats/mp4.py
 
 from doujin_tagger.audio import AudioFile
@@ -20,6 +20,7 @@ class MP4File(AudioFile, ext=["mp4", "m4a", "m4v", "3gp", "3g2", "3gp2"]):
         "\xa9alb": "album",
         "\xa9ART": "artist",
         "\xa9day": "date",
+        "\xa9cmt": "comment",
         "----:com.apple.iTunes:TAGS": "tags",
         "----:com.apple.iTunes:DOUJIN": "doujin",
         "----:com.apple.iTunes:MAKER": "maker",

@@ -1,3 +1,10 @@
+# Copyright 2019-2020 maybeRainH
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+
 from collections.abc import MutableMapping
 
 
@@ -122,9 +129,6 @@ class AudioFile(DictMixin):
         raise NotImplementedError
 
     def set_image(self, image):
-        """Replaces all embedded images by the passed image
-
-        do not save the change immediately. use .save() instead"""
         raise NotImplementedError
 
     def delete_all_tags(self):

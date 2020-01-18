@@ -1,3 +1,15 @@
+# Copyright 2019-2020 maybeRainH
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# Credits:
+# The codes in this file is largely copied and modified from:
+# https://github.com/quodlibet/quodlibet/blob/master/quodlibet/quodlibet/formats/xiph.py
+
+
 import base64
 
 from doujin_tagger.audio import AudioFile

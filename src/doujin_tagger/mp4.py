@@ -1,3 +1,14 @@
+# Copyright 2019-2020 maybeRainH
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# Credits:
+# The codes in this file is largely copied and modified from:
+# https://github.com/quodlibet/quodlibet/blob/master/quodlibet/quodlibet/formats/mp4.py
+
 from doujin_tagger.audio import AudioFile
 from doujin_tagger.mp4_patch import MP4, MP4Cover
 from doujin_tagger.util import AudioFileError, translate_errors

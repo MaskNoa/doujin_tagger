@@ -1,3 +1,14 @@
+# Copyright 2019-2020 maybeRainH
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# Credits:
+# The codes in this file is largely copied and modified from:
+# https://github.com/quodlibet/quodlibet/blob/master/quodlibet/quodlibet/formats/_audio.py
+
 import contextlib
 import datetime
 import logging
@@ -13,6 +24,10 @@ logger = logging.getLogger("doutag.util")
 
 USER_AGENT = ("Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36"
               "(KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36")
+
+# copyright statement starts -->
+# Copyright 2004-2005 Joe Wreschnig, Michael Urman
+# 2012-2017 Nick Boultbee
 
 
 class AudioFileError(Exception):
@@ -37,6 +52,17 @@ def translate_errors():
         reraise(AudioFileError, e)
     except Exception as e:
         reraise(MutagenBug, e)
+
+
+def reraise(tp, value, tb=None):
+    """Reraise an exception with a new exception type and
+    the original stack trace
+    """
+
+    if tb is None:
+        tb = sys.exc_info()[2]
+    raise tp(value).with_traceback(tb)
+#   <-- ends
 
 
 def dl_cover(url):
@@ -103,13 +129,3 @@ def find_inner_most(orig):
             orig = orig.parent
             break
     return orig
-
-
-def reraise(tp, value, tb=None):
-    """Reraise an exception with a new exception type and
-    the original stack trace
-    """
-
-    if tb is None:
-        tb = sys.exc_info()[2]
-    raise tp(value).with_traceback(tb)

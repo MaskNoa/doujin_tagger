@@ -23,7 +23,6 @@ Usage
 --dest DEST, -d DEST  destination
 --cov, -c             save cover(default)
 --nocov, -q           do not save cover
---debug               run in single thread for debug
 --lang LANG, -l LANG  0 for Japanese(default), 1 for Chinese
 --proxy               proxy used for spider(see example below)
 
@@ -31,25 +30,24 @@ usage::
 
     doutag -o <dir> -d <dir> -q --lang=1 --proxy=socks5://127.0.0.1:1080
 
-How It Works
-=============
-1. recursively match ``(?i)RJ\d+`` pattern in ``orig``.
-#. make a ``Artwork`` instance and find out all ``audios`` under artwork's directory
-#. fecth infomation from dlsite.
-#. check whether ``image_url`` is in there, if so, download and store data in ``cover``.
-#. check if ``audios`` is empty and has unsupport audio formats.
-#. save metadata and cover into each audio in ``audios``.
-#. move to ``dest``.
-
 Attention
 =========
+* Under Windows, please use double backslash, eg. E:\\MUSIC\\ORIG
+* press Ctrl+C once to safely exit the mutlithread.
 * ``orig`` and ``dest`` **MUST** under the same mount point.
 * ``orig`` and ``dest`` **MUST** NOT be the same or one is a subdirectory of other.
 * **not support WAV** for now.
-* Saving cover CAN be very slow if the file is very large. Use ``--nocov`` to disable.
+* now saving cover under each audio dir.
 
 ChangeLog
 ==========
+v0.4.0 (2019-12-31)
+-------------------
+* [feat] use tqdm to prettify output.
+* [feat] mutlithread safe exit.
+* [feat] deletel 'debug' option.
+* [bug] delete all possible mojibake tags tagged by producer
+
 v0.3.0 (2019-10-19)
 -------------------
 * [feat] remove json configuration. use a bash/bat script instead.

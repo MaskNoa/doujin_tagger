@@ -15,10 +15,11 @@ from pathlib import Path
 from doujin_tagger import spider
 from doujin_tagger.audio import AudioFile, DictMixin
 from doujin_tagger.id3 import ID3File, MP3File  # noqa
-from doujin_tagger.image import EmbeddedImage
 from doujin_tagger.mp4 import MP4File  # noqa
 from doujin_tagger.util import AudioFileError, dl_cover, find_inner_most
 from doujin_tagger.xiph import *  # noqa
+
+# from doujin_tagger.image import EmbeddedImage
 
 logger = logging.getLogger("doutag.artwork")
 
@@ -65,12 +66,15 @@ class ArtWork:
             "Tagged By github.com/maybeRainH/doujin_tagger"})
 
     def update_audios(self):
-        for root, _, files in os.walk(self.work_path):
+        dirs_need_cover = []
+        for root, dirs, files in os.walk(self.work_path):
+            audio_found = False
             for eachfile in files:
                 if UNSUPPORT_PAT.match(eachfile):
                     self.logger.error("UNSUPPORT FMT FOUND")
                     return False
                 elif AUDIO_PAT.match(eachfile):
+                    audio_found = True
                     full_path = os.path.join(root, eachfile)
                     try:
                         self.audios.append(AudioFile(full_path))
@@ -78,9 +82,14 @@ class ArtWork:
                         self.logger.error(f"LOADING ERROR --> {eachfile}")
                         self.logger.debug(traceback.format_exc())
                         return False
+            else:
+                if audio_found:
+                    dirs_need_cover.append(Path(root))
+
         if not self.audios:
             self.logger.error("AUDIOS NOT FOUND")
             return False
+        self.dirs_need_cover = dirs_need_cover
         return True
 
     def __len__(self):
@@ -118,8 +127,6 @@ class ArtWork:
 
     def fetch_and_feed(self, proxy, cover=True, lang=0):
         """give info fetched by spiders to each `AudioFile`"""
-        # spider 是一个dict似乎没用
-        # 另外,这种机制真的好吗,不过似乎可以先放着,等学会了scrapy再说
         for k, func in self.spiders.items():
             self.info = func(self.info, proxy, lang)
         for each in self.audios:
@@ -146,14 +153,16 @@ class ArtWork:
             self.logger.error("INFO UNCOMPLETE, CHECK SPIDER LOG")
             return False
 
-        # temporary resolution: continue if cover not found.
-        # if not self.cover:
-            # return False
+        if self.cover:
+            for eachdir in self.dirs_need_cover:
+                cover_path = eachdir / "cover.jpg"
+                if not cover_path.exists():
+                    cover_path.write_bytes(self.cover)
         for each in self.audios:
             try:
-                if self.cover:
-                    img = EmbeddedImage(self.cover)
-                    each.set_image(img)
+                # if self.cover:
+                    # img = EmbeddedImage(self.cover)
+                    # each.set_image(img)
                 each.save()
             except Exception:
                 self.logger.error("EXCEPTION WHEN SAVING, ABORT!")

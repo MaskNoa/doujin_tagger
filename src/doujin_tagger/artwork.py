@@ -111,11 +111,12 @@ class ArtWork:
         # make sure this is the last thing to do
         # because we don't want to keep track of the filenames after moving
         dir_name = f"{self.rjcode} {self.info['album'][0]}"
-        self.logger.debug(f'dir_name is {dir_name}')
         dir_name = ILLEGAL_PAT.sub("", dir_name)
         full_name = self.dest / dir_name
+        # XXX sometimes find_inner_most will work incorrectly
+        # due to invisible __MACOSX dir
         path_to_move = find_inner_most(self.work_path)
-        self.logger.info(f"moving to {full_name}")
+        self.logger.info(f"{path_to_move.name} moving to {full_name}")
         try:
             path_to_move.rename(full_name)
         except FileExistsError:
@@ -162,6 +163,7 @@ class ArtWork:
         if self.cover:
             for eachdir in self.dirs_need_cover:
                 cover_path = eachdir / "cover.jpg"
+                self.logger.debug(f"cover saving to {eachdir}")
                 if not cover_path.exists():
                     cover_path.write_bytes(self.cover)
         for each in self.audios:

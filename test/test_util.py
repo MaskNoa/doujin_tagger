@@ -5,16 +5,10 @@
 # the Free Software Foundation; either version 2 of the License, or
 # (at your option) any later version.
 
-import logging
 import os
 import re
 
-import pytest
-from doujin_tagger.audio import DictMixin
-from doujin_tagger.util import (dl_cover, find_inner_most, match_path,
-                                process_dlsite_info)
-
-logging.basicConfig(level=logging.DEBUG)
+from doujin_tagger.util import find_inner_most, match_path, process_dlsite_info
 
 
 def test_match_path(dir):
@@ -29,14 +23,14 @@ def test_match_path(dir):
 
 
 def test_process_dlsite_info():
-    info_date = DictMixin({'date': ['2019年1月1日']})
-    info_tags = DictMixin(
-        {'tags': ['school', ' / ', 'ear cleaning  ',
-                  ' \n /', ' / \n /', 'pure/love'], })
-    after_date = process_dlsite_info(info_date)
-    assert after_date.tolist('date') == ['2019-01', ]
-    after_tags = process_dlsite_info(info_tags)
-    assert after_tags.tolist('tags') == ['school', 'ear cleaning', 'pure/love']
+    info_date = {'date': ['2019年1月1日']}
+    info_tags = {'genre': ['school', ' / ', 'ear cleaning  ',
+                           ' \n /', ' / \n /', 'pure/love']}
+    # now process_dlsite_info modify info_date in place
+    process_dlsite_info(info_date)
+    assert info_date['date'] == ['2019-01', ]
+    process_dlsite_info(info_tags)
+    assert info_tags['genre'] == ['school', 'ear cleaning', 'pure/love']
 
 
 def test_find_inner_most(dir):
@@ -46,10 +40,3 @@ def test_find_inner_most(dir):
     assert rj23_path == str(find_inner_most(rj23_path))
     assert os.path.join(rj45_path, 'title') == str(find_inner_most(rj45_path))
     assert rj10_path == str(find_inner_most(rj10_path))
-
-
-@pytest.mark.online
-def test_dl_cover():
-    res = dl_cover(
-        "//img.dlsite.jp/modpub/images2/work/doujin/RJ203000/RJ202459_img_main.jpg")  # noqa
-    assert res

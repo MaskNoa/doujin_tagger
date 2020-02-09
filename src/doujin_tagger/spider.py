@@ -6,37 +6,24 @@
 # (at your option) any later version.
 
 import logging
-import time
 
 import requests
-from doujin_tagger.util import process_dlsite_info
 from lxml.etree import HTML
+from requests.adapters import HTTPAdapter
+from urllib3.util import Retry
+
+from .util import LANG_H, LANGS, TRANSDICTS, USER_AGENT, process_dlsite_info
 
 logger = logging.getLogger("doutag.spider")
+TIMEOUT = 10
 
-JP_TRANSDICT = {
-    "販売日": "date",
-    "声優": "artist",
-    "年齢指定": "nsfw",
-    "ジャンル": "tags",
-    "シリーズ名": "series",
-}
-
-CN_TRANSDICT = {
-    "贩卖日": "date",
-    "声优": "artist",
-    "年龄指定": "nsfw",
-    "分类": "tags",
-    "系列名": "series",
-}
-TRANSDICTS = [JP_TRANSDICT, CN_TRANSDICT]
-LANG_H = ["ja;q=1", "zh-CN,zh;q=1"]
-LANGS = ['JP', 'CN']
-
-# info now is DictMixin
+se = requests.Session()
+adapter = HTTPAdapter(max_retries=Retry(backoff_factor=0.3, total=3))
+se.mount('http://', adapter)
+se.mount('https://', adapter)
 
 
-def spider_dlsite(info, proxy, lang=0):
+def spider_dlsite(artwork, proxy, cover, lang):
     logger.info(f"scraping [DLSITE] [{LANGS[lang]}]")
     dlsite_header = {
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",  # noqa
@@ -46,89 +33,73 @@ def spider_dlsite(info, proxy, lang=0):
                    "537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/"
                    "537.36")
     }
+    cov_headers = {
+        "User-Agent": USER_AGENT,
+        "Host": "img.dlsite.jp",
+    }
     proxies = {"http": proxy, "https": proxy} if proxy else None
-    rjcode = info["rjcode"]
+    rjcode = artwork.rjcode
     url = f"https://www.dlsite.com/maniax/work/=/product_id/{rjcode}.html"
-    maxtries = 3
-    while maxtries:
-        try:
-            res = requests.get(url, headers=dlsite_header,
-                               timeout=10, proxies=proxies)
-            break
-        except requests.Timeout:
-            logger.warning(f"<{rjcode}> Timeout, RETRING [{maxtries}]")
-            time.sleep(1)
-            maxtries -= 1
-            continue
-        except requests.ConnectionError as e:
-            logger.warning(repr(e) + f"<{rjcode}> RETRING [{maxtries}]")
-            time.sleep(1)
-            maxtries -= 1
-            continue
-    else:
-        logger.warning(f"<{rjcode}> Maxtries Reached")
-        return info
+    try:
+        res = se.get(url, headers=dlsite_header,
+                     timeout=TIMEOUT, proxies=proxies)
+    except requests.exceptions.RequestException as e:
+        logger.error(f"<{rjcode}> [DLSITE] {e!r}")
+        return
 
-    if res.status_code == 404:  # status_code's type is int, not str
-        logger.warning(f"<{rjcode}> NotFound On Dlsite")
-        return info
+    if res.status_code == 404:
+        logger.warning(f"<{rjcode}> [Dlsite] INFO NotFound")
+        return
 
     html = HTML(res.text)
     for each in html.xpath("//*[@id='work_outline']/descendant::tr"):
         info_name = each.xpath("th/text()")[0]
         info_attr = each.xpath("td/descendant::*/text()")
         if info_name in TRANSDICTS[lang]:
-            info[TRANSDICTS[lang][info_name]] = info_attr
-    info["maker"] = html.xpath("//*[@class='maker_name']/a/text()")
-    info["album"] = html.xpath("//*[@id='work_name']/a/text()")
-    img_url = html.xpath("//img[@itemprop='image']/@src")
-    if "no_img" in img_url:
-        logger.debug("No Cover Found On Dlsite")
+            artwork.info[TRANSDICTS[lang][info_name]] = info_attr
+    artwork.info["maker"] = html.xpath("//*[@class='maker_name']/a/text()")
+    artwork.info["album"] = html.xpath("//*[@id='work_name']/a/text()")
+    if cover:
+        img_url = html.xpath("//img[@itemprop='image']/@src")
+        img_url = img_url[0] if img_url else ''
+        if "no_img" in img_url:
+            logger.debug("[Dlsite] No Cover Found")
+        elif img_url:
+            try:
+                r = se.get("https:" + img_url, timeout=TIMEOUT,
+                           headers=cov_headers)
+                r.raise_for_status()
+                artwork.cover = r.content
+            except requests.exceptions.RequestException as e:
+                logger.error(f"<{rjcode}> [DLSITE] COVERDL ERROR")
+                logger.debug(f"COVERDL: {e!r}")
+                artwork.cover = b''
     else:
-        info["image_url"] = img_url
-    info = process_dlsite_info(info)
-    return info
+        artwork.cover = b''
+    process_dlsite_info(artwork.info)
 
 
-def spider_hvdb(info, proxy, lang=0):
+def spider_hvdb(artwork, proxy, cover, lang):
     """当dlsite找不到artist爬取hvdb作为补充"""
 
-    if 'artist' in info and not info['artist']:
-        return info
+    if 'artist' in artwork.info and not artwork.info['artist']:
+        return
     logger.info(f"scraping [HVDB]")
     proxies = {"http": proxy, "https": proxy} if proxy else None
-    rjcode = info["rjcode"][2:]
+    rjcode = artwork.rjcode[2:]
     url = f"http://hvdb.me/Dashboard/WorkDetails/{rjcode}"
-    maxtries = 3
-
-    while maxtries:
-        try:
-            res = requests.get(url, timeout=10, proxies=proxies)
-            break
-        except requests.Timeout:
-            logger.warning(f"<{rjcode}> Timeout, RETRING [{maxtries}]")
-            time.sleep(1)
-            maxtries -= 1
-            continue
-        except requests.ConnectionError as e:
-            logger.warning(repr(e) + f"<{rjcode}> RETRING [{maxtries}]")
-            time.sleep(1)
-            maxtries -= 1
-            continue
-    else:
-        logger.warning(f"<{rjcode}> Maxtries Reached")
-        return info
-
+    try:
+        res = se.get(url, timeout=TIMEOUT, proxies=proxies)
+    except requests.exceptions.RequestException as e:
+        logger.error(f"<{rjcode}> [HVDB] {e!r}")
+        return
     if res.status_code == 500:
-        logger.warning(f"<{rjcode}> NotFound On HVDB")
-        return info
+        logger.warning(f"<{rjcode}> [HVDB] NotFound")
+        return
 
     html = HTML(res.text)
     pat = html.xpath("//input[@name='CVsString']/@value")
-    if not pat:
-        return info
-    pat = pat[0]
+    pat = pat[0] if pat else ''
     # 可能存在声优第一个字符也是ASCII?
-    info['artist'] = [each for each in pat.split(
+    artwork.info['artist'] = [each for each in pat.split(
         ',') if each and not each[0].isascii()]
-    return info

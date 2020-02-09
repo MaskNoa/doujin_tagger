@@ -12,25 +12,33 @@ import shutil
 import traceback
 from pathlib import Path
 
-from doujin_tagger import spider
-from doujin_tagger.audio import AudioFile, DictMixin
-from doujin_tagger.id3 import ID3File, MP3File  # noqa
-from doujin_tagger.mp4 import MP4File  # noqa
-from doujin_tagger.util import AudioFileError, dl_cover, find_inner_most
-from doujin_tagger.xiph import *  # noqa
+from mutagen import File, MutagenError, easyid3, easymp4
 
-# from doujin_tagger.image import EmbeddedImage
+from . import spider
+from .util import find_inner_most
+
+easymp4.EasyMP4Tags.RegisterTextKey('comment', '\xa9cmt')
+easymp4.EasyMP4Tags.RegisterFreeformKey('rjcode', 'RJCODE')
+easymp4.EasyMP4Tags.RegisterFreeformKey('maker', 'MAKER')
+easymp4.EasyMP4Tags.RegisterFreeformKey('nsfw', 'NSFW')
+easymp4.EasyMP4Tags.RegisterFreeformKey('series', 'SERIES')
+easymp4.EasyMP4Tags.RegisterFreeformKey('doujin', 'DOUJIN')
+
+easyid3.EasyID3.RegisterTextKey('comment', 'COMM')
+easyid3.EasyID3.RegisterTXXXKey('rjcode', 'RJCODE')
+easyid3.EasyID3.RegisterTXXXKey('maker', 'MAKER')
+easyid3.EasyID3.RegisterTXXXKey('nsfw', 'NSFW')
+easyid3.EasyID3.RegisterTXXXKey('series', 'SERIES')
+easyid3.EasyID3.RegisterTXXXKey('doujin', 'DOUJIN')
 
 logger = logging.getLogger("doutag.artwork")
 
-# \u30FB : Katakana Middle Dot
-# \u301c : Wave Dash
-# \uFF5E : Fullwidth Tilde (no problem)
-# \u2600-\u26ff : Misc Sym
-REFMT_REGISTRY = "|".join(AudioFile._registry)
-AUDIO_PAT = re.compile(fr".*\.({REFMT_REGISTRY})$")
+# if you convent to some uncommon fmt, you are on your own
+MP3EXTS = []
+AUDIOEXTS = ["mp3", "m4a", "ogg", "flac"]
+AUDIO_PAT = re.compile(fr".*\.({'|'.join(AUDIOEXTS)})$")
 UNSUPPORT_PAT = re.compile(r".*\.(wav|ape)$")
-ILLEGAL_PAT = re.compile(r"[\\/:*?\"<>|\r\n\u30FB\u301c\u2600-\u26ff]+")
+ILLEGAL_PAT = re.compile(r"[\\/:*?\"<>|\r\n]+")
 
 
 class MyLogger(logging.LoggerAdapter):
@@ -49,21 +57,21 @@ class ArtWork:
         if k.startswith("spider") and callable(v):
             spiders[k] = v
 
-    fields = {"album", "tags"}
+    fields = {"album", "genre"}
 
     def __init__(self, rjcode, work_path, dest):
         self.rjcode = rjcode
         self.work_path = Path(work_path)
         self.dest = Path(dest)
         self.logger = MyLogger(logger, {"ref": self})
-        self.audios = []  # AufioFile objs
+        self.audios = []
         self.cover = b''  # store binary data of image
         # <doujin> tag is always set to "1" to distinguish with normal music
-        self.info = DictMixin({
+        self.info = {
             "doujin": "1",
             "rjcode": rjcode,
             "comment":
-            "Tagged By github.com/maybeRainH/doujin_tagger"})
+            "Tagged By github.com/maybeRainH/doujin_tagger"}
 
     def update_audios(self):
         dirs_need_cover = []
@@ -77,11 +85,13 @@ class ArtWork:
                     audio_found = True
                     full_path = os.path.join(root, eachfile)
                     try:
-                        self.audios.append(AudioFile(full_path))
-                    except AudioFileError as e:
+                        f = File(full_path, easy=True)
+                    except MutagenError:
                         self.logger.error(f"LOADING ERROR --> {eachfile}")
                         self.logger.debug(traceback.format_exc())
                         return False
+                    assert f is not None
+                    self.audios.append(f)
             else:
                 if audio_found:
                     dirs_need_cover.append(Path(root))
@@ -90,6 +100,8 @@ class ArtWork:
             self.logger.error("AUDIOS NOT FOUND")
             return False
         self.dirs_need_cover = dirs_need_cover
+        self.logger.debug(f"dirs_need_cover: {len(self.dirs_need_cover)}")
+        self.logger.debug(f"audios: {len(self.audios)}")
         return True
 
     def __len__(self):
@@ -98,7 +110,8 @@ class ArtWork:
     def _recur_del_and_move(self):
         # make sure this is the last thing to do
         # because we don't want to keep track of the filenames after moving
-        dir_name = f"{self.rjcode} {self.info['album']}"
+        dir_name = f"{self.rjcode} {self.info['album'][0]}"
+        self.logger.debug(f'dir_name is {dir_name}')
         dir_name = ILLEGAL_PAT.sub("", dir_name)
         full_name = self.dest / dir_name
         path_to_move = find_inner_most(self.work_path)
@@ -123,36 +136,29 @@ class ArtWork:
 
     def _check_field(self):
         """make sure rjcode and album are present to complete rename process"""
-        return not (self.fields - self.info.keys())
+        if (self.fields - self.info.keys()):
+            self.logger.error("INFO UNCOMPLETE, CHECK SPIDER LOG")
+            return False
+        else:
+            return True
 
     def fetch_and_feed(self, proxy, cover=True, lang=0):
         """give info fetched by spiders to each `AudioFile`"""
         for k, func in self.spiders.items():
-            self.info = func(self.info, proxy, lang)
-        for each in self.audios:
-            each.feed(self.info)
-        if cover:
-            self.logger.debug("getting cover")
-            image_url = self.info.get("image_url")
-            if not image_url or "no_img" in image_url:
-                self.logger.warning("Cover Not Found")
-            else:
-                self.cover = dl_cover(image_url)
+            func(self, proxy, cover, lang)
+        if not self._check_field():
+            return False
+        return True
 
     def delete_all(self):
         """delete all files' tags in this album"""
         for each in self.audios:
-            each.delete_all_tags()
+            each.delete()
         self.logger.debug(f"[{len(self)}] files info deleted")
 
     def save_all(self):
         """save infos to all files in this album and move to dest"""
         self.logger.debug(f"self.info is {self.info}")
-
-        if not self._check_field():
-            self.logger.error("INFO UNCOMPLETE, CHECK SPIDER LOG")
-            return False
-
         if self.cover:
             for eachdir in self.dirs_need_cover:
                 cover_path = eachdir / "cover.jpg"
@@ -160,9 +166,10 @@ class ArtWork:
                     cover_path.write_bytes(self.cover)
         for each in self.audios:
             try:
-                # if self.cover:
-                    # img = EmbeddedImage(self.cover)
-                    # each.set_image(img)
+                if each.tags is None:
+                    each.add_tags()
+                for k, v in self.info.items():
+                    each.tags[k] = v
                 each.save()
             except Exception:
                 self.logger.error("EXCEPTION WHEN SAVING, ABORT!")

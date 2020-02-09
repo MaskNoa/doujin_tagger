@@ -7,11 +7,27 @@ doujin_tagger 是一个同人音声音频的批量标签处理程序.
 
 安装
 =============
-::
-    
+如果你使用foobar2000,你需要安装我fork的mutagen库解决m4a多值标签的问题
+
+根据实际情况选择:
+
+* 使用foobar2000::
+
+    git clone https://github.com/maybeRainH/mutagen.git
+
+    cd mutagen; python setup.py install
+
     git clone https://github.com/maybeRainH/doujin_tagger
-    cd doujin_tagger
-    python setup.py install
+
+    cd doujin_tagger; python setup.py install
+
+* 使用iTunes等其他软件::
+
+    pip install mutagen
+
+    git clone https://github.com/maybeRainH/doujin_tagger
+
+    cd doujin_tagger; python setup.py install
 
 用法
 ======
@@ -41,6 +57,10 @@ doujin_tagger 是一个同人音声音频的批量标签处理程序.
 
 更新日志
 =========
+v0.5.0 (2020-2-9)
+------------------
+* [feat] 删掉烂七八糟的audio相关代码和测试,爽!
+
 v0.4.0 (2019-12-31)
 -------------------
 * [feat] 使用tqdm的进度条式输出.

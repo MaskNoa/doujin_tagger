@@ -4,109 +4,61 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
 # (at your option) any later version.
-#
-# Credits:
-# The code in this file is largely copied and modified from:
-# https://github.com/quodlibet/quodlibet/blob/master/quodlibet/quodlibet/formats/_audio.py
 
-import contextlib
 import datetime
 import logging
 import os
 import re
-import sys
 from pathlib import Path
-
-import mutagen
-import requests
 
 logger = logging.getLogger("doutag.util")
 
 USER_AGENT = ("Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36"
               "(KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36")
 
-# copyright statement starts -->
-# Copyright 2004-2005 Joe Wreschnig, Michael Urman
-# 2012-2017 Nick Boultbee
+JP_TRANSDICT = {
+    "販売日": "date",
+    "声優": "artist",
+    "年齢指定": "nsfw",
+    "ジャンル": "genre",
+    "シリーズ名": "series",
+}
 
+CN_TRANSDICT = {
+    "贩卖日": "date",
+    "声优": "artist",
+    "年龄指定": "nsfw",
+    "分类": "genre",
+    "系列名": "series",
+}
 
-class AudioFileError(Exception):
-    """Base error for AudioFile, mostly IO/parsing related operations"""
-
-
-class MutagenBug(AudioFileError):
-    """Raised in is caused by a mutagen bug, so we can highlight it"""
-
-
-@contextlib.contextmanager
-def translate_errors():
-    """Context manager for mutagen calls to load/save. Translates exceptions
-    to local ones.
-    """
-
-    try:
-        yield
-    except AudioFileError:
-        raise
-    except mutagen.MutagenError as e:
-        reraise(AudioFileError, e)
-    except Exception as e:
-        reraise(MutagenBug, e)
-
-
-def reraise(tp, value, tb=None):
-    """Reraise an exception with a new exception type and
-    the original stack trace
-    """
-
-    if tb is None:
-        tb = sys.exc_info()[2]
-    raise tp(value).with_traceback(tb)
-#   <-- ends
-
-
-def dl_cover(url):
-    headers = {
-        "User-Agent": USER_AGENT,
-        "Host": "img.dlsite.jp",
-    }
-    retry = 3
-    url = "https:" + url
-    while retry > 0:
-        try:
-            res = requests.get(url, timeout=10, headers=headers)
-            res.raise_for_status()
-            break
-        except requests.RequestException as e:
-            logger.warning(f"ERROR OCCUR! RETRYING! {e}")
-            retry -= 1
-            continue
-    else:
-        logger.error("REACH MAX RETRIES! DL Fail! ABORT!")
-        return b''
-    return res.content
+TRANSDICTS = [JP_TRANSDICT, CN_TRANSDICT]
+LANG_H = ["ja;q=1", "zh-CN,zh;q=1"]
+LANGS = ['JP', 'CN']
 
 
 def process_dlsite_info(info):
+    """modified info dict in place"""
     for key, val in info.items():
         if key == "date":
             try:
-                date_tuple = re.search(r"(\d+)年(\d+)月(\d+)日", val).groups()
+                date_tuple = re.search(r"(\d+)年(\d+)月(\d+)日", val[0]).groups()
                 fmt_date = datetime.datetime(*map(int, date_tuple))
-                val = fmt_date.strftime("%Y-%m")
-                info[key] = val
-            except (AttributeError, TypeError):
+                res = fmt_date.strftime("%Y-%m")
+                # keep it a list for consistency
+                info[key] = [res, ]
+            except (AttributeError, TypeError) as e:
                 logger.warning("PROCESS DATE ERROR")
-                info[key] = ""
-        elif key in ("tags", "artist"):
+                logger.debug(e)
+                info[key] = ["", ]
+        elif key in ("genre", "artist"):
             new = []
-            for each in val.split('\n'):
+            for each in val:
                 temp = each.strip()
                 each = each.replace("/", "").strip()
                 if each:
                     new.append(temp)
             info[key] = new
-    return info
 
 
 def match_path(path, pat):

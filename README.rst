@@ -9,11 +9,27 @@ doujin_tagger is a doujin voice audio file tagger.
 
 Installation
 =============
-::
-    
+If you use foobar2000, you must install my forked version of mutagen to resolve multi-value tag issue with m4a.
+
+* using foobar2000::
+
+    python -m venv doutag; cd doutag
+
+    git clone https://github.com/maybeRainH/mutagen.git
+
+    cd mutagen; python setup.py install
+
     git clone https://github.com/maybeRainH/doujin_tagger
-    cd doujin_tagger
-    python setup.py install
+
+    cd doujin_tagger; python setup.py install
+
+* using other softwares, like iTunes::
+
+    pip install mutagen
+
+    git clone https://github.com/maybeRainH/doujin_tagger
+
+    cd doujin_tagger; python setup.py install
 
 Usage
 ======
@@ -41,6 +57,10 @@ Attention
 
 ChangeLog
 ==========
+v0.5.0 (2020-2-9)
+------------------
+* [feat] delete audio related code and shitty test. Refreshing!!
+
 v0.4.0 (2019-12-31)
 -------------------
 * [feat] use tqdm to prettify output.

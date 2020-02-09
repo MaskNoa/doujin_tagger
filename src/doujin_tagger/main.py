@@ -10,13 +10,14 @@ import logging
 import re
 import time
 
-import doujin_tagger.logger  # noqa
-from doujin_tagger.artwork import ArtWork
-from doujin_tagger.cmdline import banner, cmd_parser
-from doujin_tagger.util import match_path
 from tqdm import tqdm
 
-logger = logging.getLogger("doutag")
+from . import logger  # noqa
+from .artwork import ArtWork
+from .cmdline import banner, cmd_parser
+from .util import match_path
+
+mlogger = logging.getLogger("doutag")
 RJPAT = re.compile(r"(RJ\d+)", flags=re.IGNORECASE)
 
 
@@ -25,7 +26,8 @@ def worker(args):
     a = ArtWork(rjcode, root, dest)
     if not a.update_audios():
         return
-    a.fetch_and_feed(proxy, cover, lang)
+    if not a.fetch_and_feed(proxy, cover, lang):
+        return
     a.delete_all()  # 原来的标签可能乱码，全部删除
     a.save_all()
 
@@ -50,7 +52,7 @@ def multi(work_list):
                 break
         except KeyboardInterrupt:
             pbar.close()
-            logger.critical("wait for threads to quit")
+            mlogger.critical("wait for threads to quit")
             count = 0
             done = 0
             for e in future_list:
@@ -59,19 +61,19 @@ def multi(work_list):
                     e.cancel()
                 else:
                     done += 1
-            logger.info(f'cancel {count} work, done {done} work')
+            mlogger.info(f'cancel {count} work, done {done} work')
             break
 
 
 def main():
     banner()
     options = cmd_parser()
-    logger.info("starting")
+    mlogger.info("starting")
     work_list = [(rjcode, root, options.dest, options.cover,
                   options.lang, options.proxy)
                  for rjcode, root in match_path(options.orig, RJPAT)]
     if not work_list:
-        logger.info("no match found")
+        mlogger.info("no match found")
         return
     multi(work_list)
 

@@ -10,7 +10,7 @@ def long_description():
 
 setup(
     name="doujin_tagger",
-    version="0.4.1",
+    version="0.5.0",
     author="maybeRainH",
     author_email="gooloo911110@gmail.com",
     package_dir={"": "src"},
@@ -27,11 +27,9 @@ setup(
     url="https://github.com/maybeRainH/doujin_tagger",
     classifiers=[
         "Programming Language :: Python :: 3.7",
-        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+        "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
     ],
-    setup_requires=['pytest-runner',],
-    install_requires=['requests', 'lxml', 'mutagen', 'pillow', 'tqdm'],
-    tests_require=["pytest", "pytest-cov", "testfixtures"],
+    install_requires=['requests', 'lxml', 'tqdm'],
     include_package_data=True,
     zip_safe=False,
 )

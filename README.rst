@@ -35,14 +35,13 @@ Usage
 -h, --help            show this help message and exit
 --orig ORIG, -o ORIG  directory to process
 --dest DEST, -d DEST  destination
---cov, -c             save cover(default)
 --nocov, -q           do not save cover
 --lang LANG, -l LANG  0 for Japanese(default), 1 for Chinese
 --proxy               proxy used for spider(see example below)
 
 usage::
 
-    doutag -o <dir> -d <dir> -q --lang=1 --proxy=socks5://127.0.0.1:1080
+    doutag -o <dir> -d <dir> -q --lang=1 --proxy=127.0.0.1:1080
 
 Attention
 =========

@@ -35,10 +35,8 @@ def cmd_parser():
                         action="store", help="directory to process")
     parser.add_argument("--dest", "-d", type=str,
                         dest="dest", action="store", help="destination")
-    parser.add_argument("--cov", "-c", action="store_true",
-                        dest="cover", default=True, help="save cover(default)")
     parser.add_argument("--nocov", "-q", action="store_false",
-                        dest="cover", help="do not save cover")
+                        dest="cover", default=True, help="do not save cover")
     parser.add_argument("--debug", action="store_true", dest="debug",
                         default=False, help="run in single thread for debug")
     parser.add_argument("--lang", "-l", type=int, dest="lang", action="store",

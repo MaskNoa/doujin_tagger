@@ -35,14 +35,13 @@ doujin_tagger 是一个同人音声音频的批量标签处理程序.
 -h, --help            显示帮助
 --orig ORIG, -o ORIG  源文件夹
 --dest DEST, -d DEST  处理好的文件需要移动过去的目标文件夹
---cov, -c             保存封面(默认)
 --nocov, -q           不保存封面
 --lang LANG, -l LANG  0: 日语标签(默认), 1: 中文标签
 --proxy               代理(见下面的举例)
 
 使用::
 
-    doutag -o <文件夹> -d <文件夹> -q --lang=1 --proxy=socks5://127.0.0.1:1080
+    doutag -o <文件夹> -d <文件夹> -q --lang=1 --proxy=127.0.0.1:1080
 
 注意
 =========

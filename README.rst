@@ -13,8 +13,6 @@ If you use foobar2000, you must install my forked version of mutagen to resolve 
 
 * using foobar2000::
 
-    python -m venv doutag; cd doutag
-
     git clone https://github.com/maybeRainH/mutagen.git
 
     cd mutagen; python setup.py install

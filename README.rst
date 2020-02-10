@@ -45,6 +45,8 @@ usage::
 
 Attention
 =========
+* TAGS field now change to GENRE field.Use masstagger plugins of fb2k to
+  deal with the change.
 * Under Windows, please use double backslash, eg. E:\\MUSIC\\ORIG
 * press Ctrl+C once to safely exit the mutlithread.
 * ``orig`` and ``dest`` **MUST** under the same mount point.
@@ -56,7 +58,9 @@ ChangeLog
 ==========
 v0.5.0 (2020-2-9)
 ------------------
-* [feat] delete audio related code and shitty test. Refreshing!!
+* [feat] delete audio related code and shitty test. Refreshing!!  
+* [feat] delete cov option, download cover by default
+* [breaking change] now use GENRE instead of TAGS
 
 v0.4.0 (2019-12-31)
 -------------------

@@ -49,7 +49,7 @@ class MyLogger(logging.LoggerAdapter):
 
 
 class ArtWork:
-    """one logical album superset with many `AudioFile`s inside"""
+    """one logical album superset with many audios inside"""
 
     # register all spider functions in spider module
     spiders = {}
@@ -144,7 +144,7 @@ class ArtWork:
             return True
 
     def fetch_and_feed(self, proxy, cover=True, lang=0):
-        """give info fetched by spiders to each `AudioFile`"""
+        """give info fetched by spiders to each audio"""
         for k, func in self.spiders.items():
             func(self, proxy, cover, lang)
         if not self._check_field():

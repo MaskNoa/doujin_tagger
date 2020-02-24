@@ -47,7 +47,7 @@ Attention
 =========
 * TAGS field now change to GENRE field.Use masstagger plugins of fb2k to
   deal with the change.
-* Under Windows, please use double backslash, eg. E:\\MUSIC\\ORIG
+* Under Windows, please use double backslash, eg. ``E:\\MUSIC\\ORIG``
 * press Ctrl+C once to safely exit the mutlithread.
 * ``orig`` and ``dest`` **MUST** under the same mount point.
 * ``orig`` and ``dest`` **MUST** NOT be the same or one is a subdirectory of other.

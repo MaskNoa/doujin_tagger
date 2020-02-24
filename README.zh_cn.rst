@@ -48,7 +48,7 @@ doujin_tagger 是一个同人音声音频的批量标签处理程序.
 * TAGS标签变为了GENRE标签,这是考虑到fb2k手机上不能使用自定义的标签分类
   你可以使用fb2k的MassTagger插件对原来的标签进行整理
 * Dlsite被墙,请使用proxy选项
-* Windows下的路径名请使用双反斜杠\\,例如: E:\\MUSIC\\ORIG
+* Windows下的路径名请使用双反斜杠,例如: ``E:\\MUSIC\\ORIG``
 * 按一下Ctrl+C可以等待多线程安全退出
 * **删除了使用json保存上次配置的功能,请使用bash/bat处理,查看example.bat**
 * ``orig`` 和 ``dest`` **必须** 处于同一分区

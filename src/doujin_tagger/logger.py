@@ -39,5 +39,5 @@ tqch = TqdmHandler(tqdm)
 tqchformatter = logging.Formatter(
     "%(funcName)-16s | %(levelname)-8s | %(message)s")
 tqch.setFormatter(tqchformatter)
-tqch.setLevel(logging.WARNING)
+tqch.setLevel(logging.INFO)
 logger.addHandler(tqch)

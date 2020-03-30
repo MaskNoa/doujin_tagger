@@ -43,6 +43,8 @@ def cmd_parser():
                         default=0, help="0 for Japanese(default), 1 for Chinese")
     parser.add_argument("--proxy", type=str, dest="proxy", action="store",
                         help="proxy, the same as 'requests' module")
+    parser.add_argument("--method", "-m", type=str, dest="method", default="save2ape",
+                        action="store", help="how to save tags")
 
     options = parser.parse_args(sys.argv[1:])
     if not (options.orig and options.dest):
@@ -56,8 +58,6 @@ def cmd_parser():
     if path.splitdrive(options.orig)[0] != path.splitdrive(options.dest)[0]:
         logger.error("orig和dest文件夹不在一个分区")
         exit(1)
-    if options.proxy:
-        logger.info(f"Using Proxy: {options.proxy}")
     logger.debug(f"options is {options}")
 
     return options

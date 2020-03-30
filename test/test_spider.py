@@ -5,13 +5,13 @@
 # the Free Software Foundation; either version 2 of the License, or
 # (at your option) any later version.
 
+import io
 import os
 from unittest.mock import Mock, patch
 
 import pytest
+from doujin_tagger.spider import process_dlsite_info, spider_dlsite
 from requests import Session
-
-from doujin_tagger.spider import spider_dlsite
 
 DIR = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(DIR, 'data')
@@ -38,20 +38,6 @@ params = [
 ]
 
 
-class FakeArtWork:
-    # if we import artwork, which will import mutagen
-    # I wish tox will run without mutagen installed.
-    def __init__(self, rjcode, work_path, dest):
-        self.rjcode = rjcode
-        self.work_path = work_path
-        self.dest = dest
-        self.info = {
-            "doujin": "1",
-            "rjcode": rjcode,
-            "comment":
-            "Tagged By github.com/maybeRainH/doujin_tagger"}
-
-
 class TestDlsiteParse:
     @patch.object(Session, 'get')
     @pytest.mark.parametrize('name,expected', params)
@@ -63,10 +49,19 @@ class TestDlsiteParse:
         resp.status_code = 200
         resp.text = content
         mock_get.return_value = resp
-        artwork = FakeArtWork(name[:name.index('.')], 'fakepth', 'fakedest')
-        spider_dlsite(artwork, {}, True, 0)
-        info = artwork.info
+        info = {}
+        info['rjcode'] = name[:name.index('.')]
+        spider_dlsite(info, io.BytesIO(), False, '', 0)
         info.pop('rjcode')
-        info.pop('comment')
-        info.pop('doujin')
         assert info == expected
+
+
+def test_process_dlsite_info():
+    info_date = {'date': ['2019年1月1日']}
+    info_tags = {'genre': ['school', ' / ', 'ear cleaning  ',
+                           ' \n /', ' / \n /', 'pure/love']}
+    # now process_dlsite_info modify info_date in place
+    process_dlsite_info(info_date)
+    assert info_date['date'] == ['2019-01', ]
+    process_dlsite_info(info_tags)
+    assert info_tags['genre'] == ['school', 'ear cleaning', 'pure/love']

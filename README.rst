@@ -34,6 +34,7 @@ doujin_tagger 是一个同人音声音频的批量标签处理程序.
 =============
 1. method=save2ape(默认)
     利用foobar2000 + external_tags_ 插件,无需保存信息到音频文件的标签中,速度快
+    同时配置:fb2k > 配置 > 高级 > 标签 > External Tags > Take over all tagging打上勾
 
 2. method=save2file
     将信息保存到音频文件中,优点是跨生态,主流的音乐管理软件都可以读取

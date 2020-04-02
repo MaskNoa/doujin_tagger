@@ -35,15 +35,16 @@ def multi(module, work_list):
         except KeyboardInterrupt:
             pbar.close()
             mlogger.critical("等待线程退出,不要进一步操作")
-            count = 0
-            done = 0
+            # 不准了
+            # count = 0
+            # done = 0
             for e in future_list:
                 if not e.done():
-                    count += 1
+                    # count += 1
                     e.cancel()
-                else:
-                    done += 1
-            logger.info(f'已取消{count}个任务')
+                # else:
+                    # done += 1
+            # mlogger.info(f'已取消{count}个任务')
             break
 
 

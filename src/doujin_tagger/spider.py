@@ -52,9 +52,7 @@ def spider_dlsite(info, cov_data, coverp, proxy, lang):
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",  # noqa
     "Accept-Language": LANG_H[lang],
     "Cookies": "adultchecked=1",
-    "User-Agent": ("Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/"
-                   "537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/"
-                   "537.36")
+    "User-Agent": USER_AGENT,
     }
     cov_headers = {
         "User-Agent": USER_AGENT,

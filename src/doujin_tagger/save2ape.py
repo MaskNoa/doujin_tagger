@@ -10,7 +10,7 @@ import io
 import logging
 from pathlib import Path
 
-from mutagen import apev2
+from mutagen import MutagenError, apev2
 
 from .common import cover2dir, fetch_info, move_to
 
@@ -43,16 +43,18 @@ def save_all(audios_lst, info):
     a.update(info)
     # 和save2file的方法类似,将title置为空
     a['title'] = ''
-    buf = io.BytesIO()
-    a.save(buf)
     for each in audios_lst:
         tagfile = each.with_suffix(each.suffix + '.tag')
         try:
-            tagfile.write_bytes(b'TAGFILE' + buf.getvalue())
-        except OSError as e:
+            f = open(tagfile, 'wb+')
+            f.write(b'TAGFILE')
+            a.save(f)
+        except (OSError, MutagenError) as e:
             logger.error("无法写入TAG文件")
             logger.debug(e)
             return False
+        finally:
+            f.close()
         each.touch()
     return True
 

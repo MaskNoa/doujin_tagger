@@ -6,9 +6,9 @@ import time
 
 from tqdm import tqdm
 
-from doujin_tagger import logger  # noqa
-from doujin_tagger.cmdline import banner, cmd_parser
-from doujin_tagger.common import match_path
+from . import logger  # noqa
+from .cmdline import banner, cmd_parser
+from .common import match_path
 
 RJPAT = re.compile(r"(RJ\d+)", flags=re.IGNORECASE)
 mlogger = logging.getLogger("doutag")

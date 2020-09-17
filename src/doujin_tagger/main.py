@@ -6,9 +6,9 @@ import time
 
 from tqdm import tqdm
 
-from . import logger  # noqa
-from .cmdline import banner, cmd_parser
-from .common import match_path
+from doujin_tagger import logger  # noqa
+from doujin_tagger.cmdline import banner, cmd_parser
+from doujin_tagger.common import match_path
 
 RJPAT = re.compile(r"(RJ\d+)", flags=re.IGNORECASE)
 mlogger = logging.getLogger("doutag")
@@ -53,8 +53,8 @@ def main():
     options = cmd_parser()
     try:
         module = importlib.import_module("doujin_tagger." + options.method)
-    except ModuleNotFoundError:
-        mlogger.error(f"方法{options.method}不存在")
+    except ModuleNotFoundError as e:
+        mlogger.error(e)
         exit(1)
     work_list = [(rjcode, root, options)
                  for rjcode, root in match_path(options.orig, RJPAT)]

@@ -29,7 +29,7 @@ setup(
         "Programming Language :: Python :: 3.7",
         "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
     ],
-    install_requires=['requests', 'lxml', 'tqdm'],
+    install_requires=['requests', 'lxml', 'tqdm', 'mutagen'],
     include_package_data=True,
     zip_safe=False,
 )
